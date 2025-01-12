@@ -33,7 +33,14 @@ export default function Lab1() {
   </ol>
   My favorite recipe:
   <ol id="wd-your-favorite-recipe">
-    {/* complete on your own */}
+    <li>Heat oil in a wok or large pan</li>
+    <li>Add diced vegetables (carrots, peas, onions)</li>
+    <li>Stir-fry until vegetables are tender</li>
+    <li>Add cooked rice and break up any clumps</li>
+    <li>Season with soy sauce and seasonings</li>
+    <li>Push rice to one side and scramble eggs</li>
+    <li>Mix everything together</li>
+    <li>Garnish with green onions and serve</li>
   </ol>
   <h5>Unordered List Tag</h5>
 My favorite books (in no particular order)
@@ -46,7 +53,11 @@ My favorite books (in no particular order)
 </ul>
 Your favorite books (in no particular order)
 <ul id="wd-your-books">
-  {/* complete on your own */}
+    <li>The Three-Body Problem</li>
+    <li>The Art of War</li>
+    <li>Journey to the West</li>
+    <li>Dream of the Red Chamber</li>
+    <li>Romance of the Three Kingdoms</li>
 </ul>
       </div>
       <div id="wd-tables">
@@ -109,7 +120,18 @@ Your favorite books (in no particular order)
            value="Wonderland"
            title="The last name"
            id="wd-text-fields-last-name" />
-    {/* copy rest of form elements here  */}
+    <br />
+    <label htmlFor="wd-text-fields-email">Email:</label>
+    <input type="email" placeholder="john.doe@example.com" id="wd-text-fields-email" />
+    <br />
+    <label htmlFor="wd-text-fields-phone">Phone:</label>
+    <input type="tel" placeholder="123-456-7890" id="wd-text-fields-phone" />
+    <br />
+    <label htmlFor="wd-text-fields-dob">Date of Birth:</label>
+    <input type="date" id="wd-text-fields-dob" />
+    <br />
+    <label htmlFor="wd-text-fields-address">Address:</label>
+    <input type="text" placeholder="123 Main St" id="wd-text-fields-address" />
   </form>
 </div>
 <h5>Text boxes</h5>
