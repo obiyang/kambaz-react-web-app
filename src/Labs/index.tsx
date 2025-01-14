@@ -10,6 +10,7 @@ export default function Labs() {
       <h1>Labs</h1>
       <p>Bin Yang</p>
       <p>CS5610 35649 Web Development SEC 01 Spring 2025</p>
+      <p><a href="https://github.com/obiyang/kambaz-react-web-app.git">GitHub Repository</a></p>
       <TOC />
       <Routes>
         <Route path="/" element={<Navigate to="Lab1" />} />
