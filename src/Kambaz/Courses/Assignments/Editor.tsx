@@ -1,105 +1,127 @@
+import { Form, Button } from "react-bootstrap";
+import { BsCalendarEvent } from "react-icons/bs";
+import { IoMdClose } from "react-icons/io";
+
 export default function AssignmentEditor() {
   return (
-    <div id="wd-assignments-editor">
-      <div>
-        <label htmlFor="wd-name">Assignment Name</label><br/>
-        <input id="wd-name" value="A1 - ENV + HTML" style={{width: "200px"}} />
-      </div>
-      
-      <div style={{marginTop: "20px"}}>
-        <textarea
-          id="wd-description"
-          rows={8}
-          cols={60}
-          value="The assignment is available online Submit a link to the landing page of your Web application running on Netlify. The landing page should include the following: Your full name and section Links to each of the Lab assignments Link to the Kambas application Links to all relevant source code repositories The Kanbas application should include a link to navigate back to the landing page."
-        />
-      </div>
-
-      <div style={{marginTop: "20px"}}>
-        <label htmlFor="wd-points">Points</label>
-        <input id="wd-points" type="text" value="100" style={{width: "60px", marginLeft: "10px"}} />
-      </div>
-
-      <div style={{marginTop: "20px"}}>
-        <label htmlFor="wd-group">Assignment Group</label>
-        <select id="wd-group" style={{marginLeft: "10px"}}>
-          <option>ASSIGNMENTS</option>
-        </select>
-      </div>
-
-      <div style={{marginTop: "20px"}}>
-        <label htmlFor="wd-display-grade-as">Display Grade as</label>
-        <select id="wd-display-grade-as" style={{marginLeft: "10px"}}>
-          <option>Percentage</option>
-        </select>
-      </div>
-
-      <div style={{marginTop: "20px"}}>
-        <label htmlFor="wd-submission-type">Submission Type</label>
-        <select id="wd-submission-type" style={{marginLeft: "10px"}}>
-          <option>Online</option>
-        </select>
-      </div>
-
-      <div style={{marginTop: "20px"}}>
-        <h3>Online Entry Options</h3>
-        <div>
-          <input type="checkbox" id="wd-text-entry" />
-          <label htmlFor="wd-text-entry">Text Entry</label>
+    <div id="wd-assignments-editor" className="p-4">
+      <Form>
+        <div className="mb-3">
+          <Form.Label className="text-secondary">Assignment Name</Form.Label>
+          <Form.Control type="text" value="A1 - ENV + HTML" />
         </div>
-        <div>
-          <input type="checkbox" id="wd-website-url" />
-          <label htmlFor="wd-website-url">Website URL</label>
-        </div>
-        <div>
-          <input type="checkbox" id="wd-media-recordings" />
-          <label htmlFor="wd-media-recordings">Media Recordings</label>
-        </div>
-        <div>
-          <input type="checkbox" id="wd-student-annotation" />
-          <label htmlFor="wd-student-annotation">Student Annotation</label>
-        </div>
-        <div>
-          <input type="checkbox" id="wd-file-upload" />
-          <label htmlFor="wd-file-upload">File Uploads</label>
-        </div>
-      </div>
 
-      <div style={{marginTop: "20px"}}>
-        <label htmlFor="wd-assign-to">Assign to</label><br/>
-        <input id="wd-assign-to" type="text" value="Everyone" style={{width: "200px"}} />
-      </div>
-
-      <div style={{marginTop: "20px"}}>
-        <label htmlFor="wd-due-date">Due</label><br/>
-        <input id="wd-due-date" type="date" value="2024-05-13" />
-      </div>
-
-      <div style={{marginTop: "20px"}}>
-        <div>
-          <label htmlFor="wd-available-from">Available from</label>
-          <input 
-            id="wd-available-from" 
-            type="date" 
-            value="2024-05-06" 
-            style={{marginLeft: "10px"}}
-          />
+        <div className="mb-4">
+          <Form.Control as="textarea" rows={10} value="The assignment is available online Submit a link to the landing page of your Web application running on Netlify. The landing page should include the following: Your full name and section Links to each of the Lab assignments Link to the Kambas application Links to all relevant source code repositories The Kanbas application should include a link to navigate back to the landing page." />
         </div>
-        <div style={{marginTop: "10px"}}>
-          <label htmlFor="wd-available-until">Until</label>
-          <input 
-            id="wd-available-until" 
-            type="date" 
-            value="2024-05-20" 
-            style={{marginLeft: "10px"}}
-          />
-        </div>
-      </div>
 
-      <div style={{marginTop: "20px", textAlign: "right"}}>
-        <button>Cancel</button>
-        <button style={{marginLeft: "10px"}}>Save</button>
-      </div>
+        <div className="row mb-3">
+          <div className="col-4 text-end">
+            <Form.Label className="text-secondary">Points</Form.Label>
+          </div>
+          <div className="col-8">
+            <Form.Control type="text" value="100" />
+          </div>
+        </div>
+
+        <div className="row mb-3">
+          <div className="col-4 text-end">
+            <Form.Label className="text-secondary">Assignment Group</Form.Label>
+          </div>
+          <div className="col-8">
+            <Form.Select>
+              <option>ASSIGNMENTS</option>
+              <option>QUIZZES</option>
+              <option>EXAMS</option>
+              <option>PROJECT</option>
+            </Form.Select>
+          </div>
+        </div>
+
+        <div className="row mb-3">
+          <div className="col-4 text-end">
+            <Form.Label className="text-secondary">Display Grade as</Form.Label>
+          </div>
+          <div className="col-8">
+            <Form.Select>
+              <option>Percentage</option>
+              <option>Letter</option>
+              <option>Pass/Fail</option>
+            </Form.Select>
+          </div>
+        </div>
+
+        <div className="row mb-3">
+          <div className="col-4 text-end">
+            <Form.Label className="text-secondary">Submission Type</Form.Label>
+          </div>
+          <div className="col-8">
+            <div className="border rounded p-3">
+              <Form.Select className="mb-3">
+                <option>Online</option>
+                <option>In-person</option>
+              </Form.Select>
+
+              <Form.Label className="fw-bold">Online Entry Options</Form.Label>
+              <div className="mt-2">
+                <Form.Check type="checkbox" label="Text Entry" className="mb-2" />
+                <Form.Check type="checkbox" label="Website URL" className="mb-2" defaultChecked />
+                <Form.Check type="checkbox" label="Media Recordings" className="mb-2" />
+                <Form.Check type="checkbox" label="Student Annotation" className="mb-2" />
+                <Form.Check type="checkbox" label="File Uploads" className="mb-2" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="row mb-3">
+          <div className="col-4 text-end">
+            <Form.Label className="text-secondary">Assign</Form.Label>
+          </div>
+          <div className="col-8">
+            <div className="border rounded p-3">
+              <div className="mb-3">
+                <Form.Label>Assign to</Form.Label>
+                <div className="d-flex align-items-center border rounded p-1 mt-1" style={{ width: "fit-content" }}>
+                  <span>Everyone</span>
+                  <IoMdClose className="ms-2" />
+                </div>
+              </div>
+
+              <div className="mb-3">
+                <Form.Label>Due</Form.Label>
+                <div className="d-flex align-items-center">
+                  <Form.Control type="text" value="May 13, 2024, 11:59 PM" className="me-1" />
+                  <BsCalendarEvent />
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-6">
+                  <Form.Label>Available from</Form.Label>
+                  <div className="d-flex align-items-center">
+                    <Form.Control type="text" value="May 6, 2024, 12:00 AM" className="me-1" />
+                    <BsCalendarEvent />
+                  </div>
+                </div>
+                <div className="col-6">
+                  <Form.Label>Until</Form.Label>
+                  <div className="d-flex align-items-center">
+                    <Form.Control type="text" value="May 20, 2024, 11:59 PM" className="me-1" />
+                    <BsCalendarEvent />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr />
+        <div className="text-end">
+          <Button variant="secondary" size="lg" className="me-2">Cancel</Button>
+          <Button variant="danger" size="lg">Save</Button>
+        </div>
+      </Form>
     </div>
   );
 }

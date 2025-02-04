@@ -1,6 +1,8 @@
-import { BsGripVertical } from "react-icons/bs";
+import { BsGripVertical, BsThreeDotsVertical } from "react-icons/bs";
+import { FaPlus } from "react-icons/fa";
 import LessonControlButtons from "./LessonControlButtons";
 import ModulesControls from "./ModulesControls";
+import GreenCheckmark from "./GreenCheckmark";
 
 export default function Modules() {
     return (
@@ -8,79 +10,125 @@ export default function Modules() {
         <ModulesControls /><br /><br /><br />
         <ul id="wd-modules" className="list-group rounded-0">
           <li className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
-            <div className="wd-title p-3 ps-2 bg-secondary">
-              <BsGripVertical className="me-2 fs-3" />
-              Week 1, Lecture 1 - Course Introduction, Syllabus, Agenda
+            <div className="wd-title p-3 ps-2 bg-secondary d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center">
+                <BsGripVertical className="me-2 fs-3" />
+                Week 1
+              </div>
+              <div className="d-flex align-items-center">
+                <GreenCheckmark />
+                <button className="btn btn-transparent">
+                  <FaPlus className="ms-2" />
+                </button>
+                <button className="btn btn-transparent">
+                  <BsThreeDotsVertical className="ms-2" />
+                </button>
+              </div>
             </div>
             <ul className="wd-lessons list-group rounded-0">
               <li className="wd-lesson list-group-item p-3 ps-1">
                 <BsGripVertical className="me-2 fs-3" />
                 <span className="wd-title">LEARNING OBJECTIVES</span>
                 <LessonControlButtons />
-                <ul className="wd-content list-unstyled mt-2">
-                  <li className="wd-content-item">Introduction to the course</li>
-                  <li className="wd-content-item">Learn what is Web Development</li>
-                </ul>
               </li>
               <li className="wd-lesson list-group-item p-3 ps-1">
                 <BsGripVertical className="me-2 fs-3" />
-                <span className="wd-title">READING</span>
+                <span className="wd-title">Introduction to the course</span>
                 <LessonControlButtons />
-                <ul className="wd-content list-unstyled mt-2">
-                  <li className="wd-content-item">Full Stack Developer - Chapter 1 - Introduction</li>
-                  <li className="wd-content-item">Full Stack Developer - Chapter 2 - Creating Us</li>
-                </ul>
               </li>
               <li className="wd-lesson list-group-item p-3 ps-1">
                 <BsGripVertical className="me-2 fs-3" />
-                <span className="wd-title">SLIDES</span>
+                <span className="wd-title">Learn what is web development</span>
                 <LessonControlButtons />
-                <ul className="wd-content list-unstyled mt-2">
-                  <li className="wd-content-item">Introduction to Web Development</li>
-                  <li className="wd-content-item">Creating an HTTP server with Node.js</li>
-                  <li className="wd-content-item">Creating a React Application</li>
-                </ul>
               </li>
             </ul>
           </li>
           <li className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
-            <div className="wd-title p-3 ps-2 bg-secondary">
-              <BsGripVertical className="me-2 fs-3" />
-              Week 1, Lecture 2 - Formatting User Interfaces with HTML
+            <div className="wd-title p-3 ps-2 bg-secondary d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center">
+                <BsGripVertical className="me-2 fs-3" />
+                Week 2
+              </div>
+              <div className="d-flex align-items-center">
+                <GreenCheckmark />
+                <button className="btn btn-transparent">
+                  <FaPlus className="ms-2" />
+                </button>
+                <button className="btn btn-transparent">
+                  <BsThreeDotsVertical className="ms-2" />
+                </button>
+              </div>
             </div>
             <ul className="wd-lessons list-group rounded-0">
               <li className="wd-lesson list-group-item p-3 ps-1">
                 <BsGripVertical className="me-2 fs-3" />
-                <span className="wd-title">LEARNING OBJECTIVES</span>
+                <span className="wd-title">LESSON 1</span>
                 <LessonControlButtons />
-                <ul className="wd-content list-unstyled mt-2">
-                  <li className="wd-content-item">Learn how to create user interfaces with HTML</li>
-                  <li className="wd-content-item">Deploy the assignment to Netlify</li>
-                </ul>
               </li>
               <li className="wd-lesson list-group-item p-3 ps-1">
                 <BsGripVertical className="me-2 fs-3" />
-                <span className="wd-title">SLIDES</span>
+                <span className="wd-title">LESSON 2</span>
                 <LessonControlButtons />
-                <ul className="wd-content list-unstyled mt-2">
-                  <li className="wd-content-item">Introduction to HTML and the DOM</li>
-                  <li className="wd-content-item">Formatting Web content with Headings and</li>
-                  <li className="wd-content-item">Formatting content with Lists and Tables</li>
-                </ul>
               </li>
             </ul>
           </li>
           <li className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
-            <div className="wd-title p-3 ps-2 bg-secondary">
-              <BsGripVertical className="me-2 fs-3" />
-              Week 2
+            <div className="wd-title p-3 ps-2 bg-secondary d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center">
+                <BsGripVertical className="me-2 fs-3" />
+                Week 3
+              </div>
+              <div className="d-flex align-items-center">
+                <GreenCheckmark />
+                <button className="btn btn-transparent">
+                  <FaPlus className="ms-2" />
+                </button>
+                <button className="btn btn-transparent">
+                  <BsThreeDotsVertical className="ms-2" />
+                </button>
+              </div>
             </div>
+            <ul className="wd-lessons list-group rounded-0">
+              <li className="wd-lesson list-group-item p-3 ps-1">
+                <BsGripVertical className="me-2 fs-3" />
+                <span className="wd-title">LESSON 1</span>
+                <LessonControlButtons />
+              </li>
+              <li className="wd-lesson list-group-item p-3 ps-1">
+                <BsGripVertical className="me-2 fs-3" />
+                <span className="wd-title">LESSON 2</span>
+                <LessonControlButtons />
+              </li>
+            </ul>
           </li>
           <li className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
-            <div className="wd-title p-3 ps-2 bg-secondary">
-              <BsGripVertical className="me-2 fs-3" />
-              Week 3
+            <div className="wd-title p-3 ps-2 bg-secondary d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center">
+                <BsGripVertical className="me-2 fs-3" />
+                Week 4
+              </div>
+              <div className="d-flex align-items-center">
+                <GreenCheckmark />
+                <button className="btn btn-transparent">
+                  <FaPlus className="ms-2" />
+                </button>
+                <button className="btn btn-transparent">
+                  <BsThreeDotsVertical className="ms-2" />
+                </button>
+              </div>
             </div>
+            <ul className="wd-lessons list-group rounded-0">
+              <li className="wd-lesson list-group-item p-3 ps-1">
+                <BsGripVertical className="me-2 fs-3" />
+                <span className="wd-title">LESSON 1</span>
+                <LessonControlButtons />
+              </li>
+              <li className="wd-lesson list-group-item p-3 ps-1">
+                <BsGripVertical className="me-2 fs-3" />
+                <span className="wd-title">LESSON 2</span>
+                <LessonControlButtons />
+              </li>
+            </ul>
           </li>
         </ul>
       </div>

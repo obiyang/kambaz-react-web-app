@@ -1,19 +1,83 @@
+import { Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+
 export default function Profile() {
   return (
-    <div id="wd-profile-screen">
-      <h3>Profile</h3>
-      <input defaultValue="alice" placeholder="username" className="wd-username"/><br/>
-      <input defaultValue="123"   placeholder="password" type="password"
-             className="wd-password" /><br/>
-      <input defaultValue="Alice" placeholder="First Name" id="wd-firstname" /><br/>
-      <input defaultValue="Wonderland" placeholder="Last Name" id="wd-lastname" /><br/>
-      <input defaultValue="2000-01-01" type="date" id="wd-dob" /><br/>
-      <input defaultValue="alice@wonderland" type="email" id="wd-email" /><br/>
-      <select defaultValue="FACULTY" id="wd-role">
-        <option value="USER">User</option>       <option value="ADMIN">Admin</option>
-        <option value="FACULTY">Faculty</option> <option value="STUDENT">Student</option>
-      </select><br/>
-      <Link to="/Kambaz/Account/Signin" >Sign out</Link>
+    <div className="p-4">
+      <h1 className="mb-4">Profile</h1>
+      <Form>
+        <Form.Group className="mb-3">
+          <Form.Control
+            type="text"
+            placeholder="username"
+            defaultValue="alice"
+            className="form-control-lg"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Control
+            type="text"
+            placeholder="password"
+            defaultValue="123"
+            className="form-control-lg"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Control
+            type="text"
+            placeholder="First Name"
+            defaultValue="Alice"
+            className="form-control-lg"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Control
+            type="text"
+            placeholder="Last Name"
+            defaultValue="Wonderland"
+            className="form-control-lg"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Control
+            type="date"
+            placeholder="mm/dd/yyyy"
+            className="form-control-lg"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Control
+            type="email"
+            placeholder="alice@wonderland.com"
+            defaultValue="alice@wonderland"
+            className="form-control-lg"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Control
+            as="select"
+            className="form-control-lg"
+            defaultValue="USER"
+          >
+            <option value="USER">User</option> 
+            <option value="ADMIN">Admin</option>
+            <option value="FACULTY">Faculty</option> 
+            <option value="STUDENT">Student</option>
+          </Form.Control>
+        </Form.Group>
+
+        <Link to="/Kambaz/Account/Signin" >
+          <Button variant="danger" size="lg" className="w-100">
+            Sign out
+          </Button>
+        </Link>
+      </Form>
     </div>
-);}
+  );
+}

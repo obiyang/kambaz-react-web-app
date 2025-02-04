@@ -4,14 +4,19 @@ import Modules from "./Modules";
 import Home from "./Home";
 import Assignments from "./Assignments";
 import AssignmentEditor from "./Assignments/Editor";
+import PeopleTable from "./People/table";
+import { FaBars } from "react-icons/fa";
 
 export default function Courses() {
   return (
     <div id="wd-courses">
-      <h2>Course 1234</h2>
+      <div className="d-flex align-items-center">
+        <FaBars className="me-2" />
+        <h2>Course 1234</h2>
+      </div>
       <hr />
       <div className="d-flex">
-        <div className="flex-grow-0">
+        <div className="d-none d-lg-block" style={{ width: "200px", minWidth: "200px" }}>
           <CourseNavigation />
         </div>
         <div className="flex-grow-1">
@@ -25,7 +30,7 @@ export default function Courses() {
             <Route path="Zoom" element={<h2>Zoom</h2>} />
             <Route path="Quizzes" element={<h2>Quizzes</h2>} />
             <Route path="Grades" element={<h2>Grades</h2>} />
-            <Route path="People" element={<h2>People</h2>} />
+            <Route path="People" element={<PeopleTable />} />
           </Routes>
         </div>
       </div>

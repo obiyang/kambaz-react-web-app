@@ -1,9 +1,13 @@
-import { FaCheckCircle, FaCircle } from "react-icons/fa";
-export default function GreenCheckmark() {
+import { FaCheckCircle } from "react-icons/fa";
+
+interface GreenCheckmarkProps {
+  variant?: 'light' | 'dark';
+}
+
+export default function GreenCheckmark({ variant = 'light' }: GreenCheckmarkProps) {
+  const checkColor = variant === 'light' ? 'text-success' : 'text-white';
+  
   return (
-    <span className="me-1 position-relative">
-      <FaCheckCircle style={{ top: "2px" }}
-        className="text-success me-1 position-absolute fs-5" />
-      <FaCircle className="text-white me-1 fs-6" />
-    </span>
-);}
+    <FaCheckCircle className={`${checkColor} me-1 fs-5`} />
+  );
+}

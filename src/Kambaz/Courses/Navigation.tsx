@@ -60,7 +60,7 @@ export default function CourseNavigation() {
       </NavLink>
       
       <NavLink 
-        to="/Kambaz/People" 
+        to="/Kambaz/Courses/1234/People" 
         id="wd-course-people-link"
         className={({ isActive }) => `list-group-item ${isActive ? 'active' : 'text-danger'} border border-0`}
       >
