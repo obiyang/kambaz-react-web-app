@@ -25,7 +25,7 @@ export default function KambazNavigation() {
             className={`list-group-item text-center border-0 d-flex flex-column align-items-center p-2 ${
               selectedButton === 'account' ? 'bg-white text-danger' : 'bg-black text-white'
             }`}>
-        <FaRegCircleUser className="fs-1 text-white mb-1" />
+        <FaRegCircleUser className="fs-1 text-danger mb-1" />
         Account
       </NavLink>
       <br />
