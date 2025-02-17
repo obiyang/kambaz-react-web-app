@@ -1,18 +1,26 @@
 import CourseNavigation from "./Navigation";
-import { Navigate, Route, Routes } from "react-router";
+import { courses } from "../Database";
+import { FaAlignJustify } from "react-icons/fa6";
+import { Navigate, Route, Routes, useParams, useLocation } from "react-router";
 import Modules from "./Modules";
 import Home from "./Home";
 import Assignments from "./Assignments";
 import AssignmentEditor from "./Assignments/Editor";
 import PeopleTable from "./People/table";
-import { FaBars } from "react-icons/fa";
 
 export default function Courses() {
+  const { cid } = useParams();
+  const course = courses.find((course) => course._id === cid);
+  const { pathname } = useLocation();
+  const currentScreen = pathname.split("/")[4];
+
   return (
     <div id="wd-courses">
       <div className="d-flex align-items-center">
-        <FaBars className="me-2" />
-        <h2>Course 1234</h2>
+        <FaAlignJustify className="me-4 fs-4 mb-1" />
+        <h2 className="text-danger m-0">
+          {course && course.name} &gt; {currentScreen}
+        </h2>
       </div>
       <hr />
       <div className="d-flex">

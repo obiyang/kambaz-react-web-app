@@ -1,12 +1,25 @@
-import { NavLink } from "react-router-dom";
 import { AiOutlineDashboard } from "react-icons/ai";
 import { IoCalendarOutline } from "react-icons/io5";
 import { LiaBookSolid, LiaCogSolid } from "react-icons/lia";
 import { FaInbox, FaRegCircleUser } from "react-icons/fa6";
-import { useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 
 export default function KambazNavigation() {
-  const [selectedButton, setSelectedButton] = useState('dashboard');
+  const { pathname } = useLocation();
+
+  const links = [
+    { id: "wd-account-link", label: "Account", path: "/Kambaz/Account", icon: FaRegCircleUser, active: "Account" },
+    { id: "wd-dashboard-link", label: "Dashboard", path: "/Kambaz/Dashboard", icon: AiOutlineDashboard, active: "Dashboard" },
+    { id: "wd-course-link", label: "Courses", path: "/Kambaz/Dashboard", icon: LiaBookSolid, active: "Courses" },
+    { id: "wd-calendar-link", label: "Calendar", path: "/Kambaz/Calendar", icon: IoCalendarOutline, active: "Calendar" },
+    { id: "wd-inbox-link", label: "Inbox", path: "/Kambaz/Inbox", icon: FaInbox, active: "Inbox" },
+    { id: "wd-labs-link", label: "Labs", path: "/Labs", icon: LiaCogSolid, active: "Labs" }
+  ];
+
+  const currentActive = links.find(link => 
+    pathname.includes(link.path) && 
+    (link.path !== "/Kambaz/Dashboard" || link.label === "Dashboard")
+  )?.active || "";
 
   return (
     <div id="wd-kambaz-navigation" 
@@ -18,66 +31,24 @@ export default function KambazNavigation() {
          className="list-group-item bg-black border-0 text-center">
         <img src="/images/NEU.jpg" width="75px" />
       </a>
-      <br />
-      <NavLink to="/Kambaz/Account" 
-            id="wd-account-link"
-            onClick={() => setSelectedButton('account')}
+      {links.map((link) => (
+        <div key={link.id}>
+          <br />
+          <NavLink 
+            to={link.path}
+            id={link.id}
             className={`list-group-item text-center border-0 d-flex flex-column align-items-center p-2 ${
-              selectedButton === 'account' ? 'bg-white text-danger' : 'bg-black text-white'
+              currentActive === link.active ? 'bg-white text-danger' : 'bg-black text-white'
             }`}>
-        <FaRegCircleUser className="fs-1 text-danger mb-1" />
-        Account
-      </NavLink>
-      <br />
-      <NavLink to="/Kambaz/Dashboard" 
-            id="wd-dashboard-link"
-            onClick={() => setSelectedButton('dashboard')}
-            className={`list-group-item text-center border-0 d-flex flex-column align-items-center p-2 ${
-              selectedButton === 'dashboard' ? 'bg-white text-danger' : 'bg-black text-white'
-            }`}>
-        <AiOutlineDashboard className="fs-1 text-danger mb-1" />
-        Dashboard
-      </NavLink>
-      <br />
-      <NavLink to="/Kambaz/Dashboard" 
-            id="wd-course-link"
-            onClick={() => setSelectedButton('courses')}
-            className={`list-group-item text-center border-0 d-flex flex-column align-items-center p-2 ${
-              selectedButton === 'courses' ? 'bg-white text-danger' : 'bg-black text-white'
-            }`}>
-        <LiaBookSolid className="fs-1 text-danger mb-1" />
-        Courses
-      </NavLink>
-      <br />
-      <NavLink to="/Kambaz/Calendar" 
-            id="wd-calendar-link"
-            onClick={() => setSelectedButton('calendar')}
-            className={`list-group-item text-center border-0 d-flex flex-column align-items-center p-2 ${
-              selectedButton === 'calendar' ? 'bg-white text-danger' : 'bg-black text-white'
-            }`}>
-        <IoCalendarOutline className="fs-1 text-danger mb-1" />
-        Calendar
-      </NavLink>
-      <br />
-      <NavLink to="/Kambaz/Inbox" 
-            id="wd-inbox-link"
-            onClick={() => setSelectedButton('inbox')}
-            className={`list-group-item text-center border-0 d-flex flex-column align-items-center p-2 ${
-              selectedButton === 'inbox' ? 'bg-white text-danger' : 'bg-black text-white'
-            }`}>
-        <FaInbox className="fs-1 text-danger mb-1" />
-        Inbox
-      </NavLink>
-      <br />
-      <NavLink to="/Labs" 
-            id="wd-labs-link"
-            onClick={() => setSelectedButton('labs')}
-            className={`list-group-item text-center border-0 d-flex flex-column align-items-center p-2 ${
-              selectedButton === 'labs' ? 'bg-white text-danger' : 'bg-black text-white'
-            }`}>
-        <LiaCogSolid className="fs-1 text-danger mb-1" />
-        Labs
-      </NavLink>
+            <link.icon className={`fs-1 mb-1 ${
+              link.label === 'Account' 
+                ? currentActive === link.active ? 'text-danger' : 'text-white'
+                : 'text-danger'
+            }`} />
+            {link.label}
+          </NavLink>
+        </div>
+      ))}
     </div>
   );
 }

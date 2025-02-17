@@ -1,9 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { FaSearch, FaPlus, FaEllipsisV, FaCheckCircle } from "react-icons/fa";
 import { BsGripVertical } from "react-icons/bs";
 import { MdAssignment } from "react-icons/md";
+import * as db from "../../Database";
+
+interface Assignment {
+  _id: string;
+  title: string;
+  course: string;
+}
 
 export default function Assignments() {
+  const { cid } = useParams();
+  const assignments = db.assignments as Assignment[];
+  const courseAssignments = assignments.filter((assignment) => assignment.course === cid);
+
   return (
     <div id="wd-assignments" className="p-2">
       {/* Search and Buttons Row */}
@@ -41,71 +52,34 @@ export default function Assignments() {
 
       {/* Assignments List */}
       <ul id="wd-assignment-list" className="list-unstyled border-start border-success border-4 ps-1 fs-5">
-        <li className="wd-assignment-item mb-3">
-          <div className="d-flex align-items-center">
-            <BsGripVertical className="me-2 fs-3" />
-            <MdAssignment className="me-2 text-success fs-3" />
-            <div className="flex-grow-1">
-              <Link to="A1" className="wd-assignment-link mb-1 d-block">A1</Link>
-              <div className="d-flex align-items-center text-secondary fs-6">
-                <span className="text-danger">Multiple Modules</span>
-                <span className="mx-2">|</span>
-                <span>Not available until May 6 at 12:00am</span>
+        {courseAssignments.map((assignment) => (
+          <li key={assignment._id} className="wd-assignment-item mb-3">
+            <div className="d-flex align-items-center">
+              <BsGripVertical className="me-2 fs-3" />
+              <MdAssignment className="me-2 text-success fs-3" />
+              <div className="flex-grow-1">
+                <Link 
+                  to={assignment._id} 
+                  className="wd-assignment-link mb-1 d-block"
+                >
+                  {assignment.title}
+                </Link>
+                <div className="d-flex align-items-center text-secondary fs-6">
+                  <span className="text-danger">Multiple Modules</span>
+                  <span className="mx-2">|</span>
+                  <span>Not available until May 6 at 12:00am</span>
+                </div>
+                <div className="text-secondary fs-6">
+                  Due May 13 at 11:59pm | 100 pts
+                </div>
               </div>
-              <div className="text-secondary fs-6">
-                Due May 13 at 11:59pm | 100 pts
-              </div>
-            </div>
-            <div className="d-flex align-items-center me-4">
-              <FaCheckCircle className="text-success me-3 fs-5" />
-              <FaEllipsisV className="text-dark fs-5" />
-            </div>
-          </div>
-        </li>
-
-        <li className="wd-assignment-item mb-3">
-          <div className="d-flex align-items-center">
-            <BsGripVertical className="me-2 fs-3" />
-            <MdAssignment className="me-2 text-success fs-3" />
-            <div className="flex-grow-1">
-              <Link to="A2" className="wd-assignment-link mb-1 d-block">A2</Link>
-              <div className="d-flex align-items-center text-secondary fs-6">
-                <span className="text-danger">Multiple Modules</span>
-                <span className="mx-2">|</span>
-                <span>Not available until May 13 at 12:00am</span>
-              </div>
-              <div className="text-secondary fs-6">
-                Due May 20 at 11:59pm | 100 pts
+              <div className="d-flex align-items-center me-4">
+                <FaCheckCircle className="text-success me-3 fs-5" />
+                <FaEllipsisV className="text-dark fs-5" />
               </div>
             </div>
-            <div className="d-flex align-items-center me-4">
-              <FaCheckCircle className="text-success me-3 fs-5" />
-              <FaEllipsisV className="text-dark fs-5" />
-            </div>
-          </div>
-        </li>
-
-        <li className="wd-assignment-item mb-3">
-          <div className="d-flex align-items-center">
-            <BsGripVertical className="me-2 fs-3" />
-            <MdAssignment className="me-2 text-success fs-3" />
-            <div className="flex-grow-1">
-              <Link to="A3" className="wd-assignment-link mb-1 d-block">A3</Link>
-              <div className="d-flex align-items-center text-secondary fs-6">
-                <span className="text-danger">Multiple Modules</span>
-                <span className="mx-2">|</span>
-                <span>Not available until May 20 at 12:00am</span>
-              </div>
-              <div className="text-secondary fs-6">
-                Due May 27 at 11:59pm | 100 pts
-              </div>
-            </div>
-            <div className="d-flex align-items-center me-4">
-              <FaCheckCircle className="text-success me-3 fs-5" />
-              <FaEllipsisV className="text-dark fs-5" />
-            </div>
-          </div>
-        </li>
+          </li>
+        ))}
       </ul>
     </div>
   );
