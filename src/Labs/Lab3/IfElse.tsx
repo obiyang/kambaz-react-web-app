@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 function IfElse() {
    let true1 = true, false1 = false;
