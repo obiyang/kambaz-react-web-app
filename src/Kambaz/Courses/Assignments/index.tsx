@@ -3,6 +3,7 @@ import { FaSearch, FaPlus, FaEllipsisV, FaCheckCircle } from "react-icons/fa";
 import { BsGripVertical } from "react-icons/bs";
 import { MdAssignment } from "react-icons/md";
 import * as db from "../../Database";
+import { useSelector } from "react-redux";
 
 interface Assignment {
   _id: string;
@@ -14,6 +15,9 @@ export default function Assignments() {
   const { cid } = useParams();
   const assignments = db.assignments as Assignment[];
   const courseAssignments = assignments.filter((assignment) => assignment.course === cid);
+  
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const isFaculty = currentUser?.role === "FACULTY";
 
   return (
     <div id="wd-assignments" className="p-2">
@@ -29,14 +33,17 @@ export default function Assignments() {
             style={{ width: "240px", backgroundColor: "white" }}
           />
         </div>
-        <div>
-          <button id="wd-add-assignment-group" className="btn btn-light me-2">
-            <FaPlus className="me-1" />Group
-          </button>
-          <button id="wd-add-assignment" className="btn btn-danger">
-            <FaPlus className="me-1" />Assignment
-          </button>
-        </div>
+
+        {isFaculty && (
+          <div>
+            <button id="wd-add-assignment-group" className="btn btn-light me-2">
+              <FaPlus className="me-1" />Group
+            </button>
+            <button id="wd-add-assignment" className="btn btn-danger">
+              <FaPlus className="me-1" />Assignment
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Assignments Header */}
@@ -45,8 +52,13 @@ export default function Assignments() {
           <BsGripVertical className="me-2 fs-3" />
           <h3 id="wd-assignments-title" className="mb-0">ASSIGNMENTS</h3>
           <span className="text-dark ms-auto me-2 border border-dark rounded-pill px-2 py-1">40% of Total</span>
-          <FaPlus className="me-2 text-dark fs-5" />
-          <FaEllipsisV className="text-dark fs-5" />
+          
+          {isFaculty && (
+            <>
+              <FaPlus className="me-2 text-dark fs-5" />
+              <FaEllipsisV className="text-dark fs-5" />
+            </>
+          )}
         </div>
       </div>
 
@@ -75,7 +87,8 @@ export default function Assignments() {
               </div>
               <div className="d-flex align-items-center me-4">
                 <FaCheckCircle className="text-success me-3 fs-5" />
-                <FaEllipsisV className="text-dark fs-5" />
+                
+                {isFaculty && <FaEllipsisV className="text-dark fs-5" />}
               </div>
             </div>
           </li>

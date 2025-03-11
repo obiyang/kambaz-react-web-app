@@ -1,6 +1,7 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { Row, Col, Card, Button, FormControl } from "react-bootstrap";
+import { useSelector } from "react-redux";
+import * as db from "./Database";
 
 export default function Dashboard({ 
   courses, course, setCourse, addNewCourse, 
@@ -10,6 +11,12 @@ export default function Dashboard({
   addNewCourse: () => void; deleteCourse: (courseId: string) => void; 
   updateCourse: () => void; 
 }) {
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const enrollments = db.enrollments;
+  
+  // 检查当前用户是否为FACULTY角色
+  const isFaculty = currentUser?.role === "FACULTY";
+
   const getCourseImage = (courseId: string) => {
     const imageMap: { [key: string]: string } = {
       'RS101': '/images/rocket-propulsion.jpg',
@@ -24,27 +31,43 @@ export default function Dashboard({
     return imageMap[courseId] || '/images/reactjs.jpg';
   };
 
+  // Filter courses to only show those the current user is enrolled in
+  const filteredCourses = courses.filter((course) =>
+    enrollments.some(
+      (enrollment: any) => 
+        enrollment.user === currentUser?._id && 
+        enrollment.course === course._id
+    )
+  );
+
   return (
     <div id="wd-dashboard">
       <h1 id="wd-dashboard-title">Dashboard</h1> <hr />
-      <h5>New Course
-          <button className="btn btn-primary float-end"
-                  id="wd-add-new-course-click"
-                  onClick={addNewCourse} > Add </button>
-                  <button className="btn btn-warning float-end me-2"
-                onClick={updateCourse} id="wd-update-course-click">
-          Update
-        </button>
-      </h5><br />
-      <FormControl value={course.name} className="mb-2"
-             onChange={(e) => setCourse({ ...course, name: e.target.value }) } />
-      <FormControl value={course.description} rows={3}
-             onChange={(e) => setCourse({ ...course, description: e.target.value }) } />
-      <hr />
-      <h2 id="wd-dashboard-published">Published Courses ({courses.length})</h2> <hr />
+      
+      {/* 只有FACULTY角色才能看到新课程表单 */}
+      {isFaculty && (
+        <>
+          <h5>New Course
+            <button className="btn btn-primary float-end"
+                    id="wd-add-new-course-click"
+                    onClick={addNewCourse}>Add</button>
+            <button className="btn btn-warning float-end me-2"
+                    onClick={updateCourse} id="wd-update-course-click">
+              Update
+            </button>
+          </h5><br />
+          <FormControl value={course.name} className="mb-2"
+                onChange={(e) => setCourse({ ...course, name: e.target.value })} />
+          <FormControl value={course.description} rows={3}
+                onChange={(e) => setCourse({ ...course, description: e.target.value })} />
+          <hr />
+        </>
+      )}
+      
+      <h2 id="wd-dashboard-published">Published Courses ({filteredCourses.length})</h2> <hr />
       <div id="wd-dashboard-courses">
         <Row xs={1} md={5} className="g-4">
-          {courses.map((course) => (
+          {filteredCourses.map((course) => (
             <Col key={course._id} className="wd-dashboard-course" style={{ width: "300px" }}>
               <Card>
                 <Link to={`/Kambaz/Courses/${course._id}/Home`}
@@ -66,23 +89,28 @@ export default function Dashboard({
                     <Card.Text className="wd-dashboard-course-description overflow-hidden" style={{ height: "100px" }}>
                       {course.description}
                     </Card.Text>
-                    <Button variant="primary"> Go </Button>
-                    <button onClick={(event) => {
-                      event.preventDefault();
-                      deleteCourse(course._id);
-                    }} className="btn btn-danger float-end"
-                    id="wd-delete-course-click">
-                    Delete
-            </button>
-            <button id="wd-edit-course-click"
-  onClick={(event) => {
-    event.preventDefault();
-    setCourse({...course});
-  }}
-  className="btn btn-warning me-2 float-end" >
-  Edit
-</button>
-
+                    <Button variant="primary">Go</Button>
+                    
+                    {/* 只有FACULTY角色才能看到编辑和删除按钮 */}
+                    {isFaculty && (
+                      <>
+                        <button onClick={(event) => {
+                          event.preventDefault();
+                          deleteCourse(course._id);
+                        }} className="btn btn-danger float-end"
+                        id="wd-delete-course-click">
+                          Delete
+                        </button>
+                        <button id="wd-edit-course-click"
+                          onClick={(event) => {
+                            event.preventDefault();
+                            setCourse({...course});
+                          }}
+                          className="btn btn-warning me-2 float-end">
+                          Edit
+                        </button>
+                      </>
+                    )}
                   </Card.Body>
                 </Link>
               </Card>
