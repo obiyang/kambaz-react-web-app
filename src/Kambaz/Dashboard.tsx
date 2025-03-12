@@ -12,9 +12,18 @@ export default function Dashboard() {
   const { enrollments } = useSelector((state: any) => state.enrollmentsReducer);
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   
-  // 本地状态只保留当前正在编辑的课程
+  // Check if current user has FACULTY role
+  const isFaculty = currentUser?.role === "FACULTY";
+  
+  // Check if current user has STUDENT role
+  const isStudent = currentUser?.role === "STUDENT";
+  
+  // State for showing all courses or only enrolled courses
+  const [showAllCourses, setShowAllCourses] = useState(isFaculty ? true : false);
+  
+  // Local state only keeps the currently edited course
   const [course, setCourse] = useState({
-    _id: "1234", 
+    _id: "", 
     name: "New Course", 
     number: "New Number",
     startDate: "2023-09-10", 
@@ -25,15 +34,6 @@ export default function Dashboard() {
     description: "New Description"
   });
   
-  // 显示所有课程或仅显示已注册课程的状态
-  const [showAllCourses, setShowAllCourses] = useState(false);
-  
-  // 检查当前用户是否为FACULTY角色
-  const isFaculty = currentUser?.role === "FACULTY";
-  
-  // 检查当前用户是否为STUDENT角色
-  const isStudent = currentUser?.role === "STUDENT";
-
   const getCourseImage = (courseId: string) => {
     const imageMap: { [key: string]: string } = {
       'RS101': '/images/rocket-propulsion.jpg',
@@ -48,7 +48,7 @@ export default function Dashboard() {
     return imageMap[courseId] || '/images/reactjs.jpg';
   };
 
-  // 检查用户是否已注册课程
+  // Check if user is enrolled in a course
   const isEnrolled = (courseId: string) => {
     return enrollments.some(
       (enrollment: any) => 
@@ -57,38 +57,62 @@ export default function Dashboard() {
     );
   };
 
-  // 处理注册课程
+  // Handle course enrollment
   const handleEnrollCourse = (courseId: string, event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
     dispatch(enrollCourse({ userId: currentUser._id, courseId }));
   };
 
-  // 处理退订课程
+  // Handle course unenrollment
   const handleUnenrollCourse = (courseId: string, event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
     dispatch(unenrollCourse({ userId: currentUser._id, courseId }));
   };
 
-  // 处理课程导航，只有已注册的学生才能访问课程
+  // Handle course navigation, only enrolled students can access courses
   const handleCourseNavigation = (courseId: string, event: React.MouseEvent) => {
     if (isStudent && !isEnrolled(courseId)) {
       event.preventDefault();
-      // 学生未注册该课程，阻止导航
+      // Student not enrolled in this course, prevent navigation
       return;
     }
-    // 其他情况正常导航
+    // Normal navigation for other cases
     navigate(`/Kambaz/Courses/${courseId}/Home`);
   };
 
-  // 根据显示模式选择要显示的课程
+  // Select courses to display based on display mode
   const displayedCourses = showAllCourses 
     ? courses 
     : courses.filter((course: any) => isEnrolled(course._id));
 
   const handleAddNewCourse = () => {
-    dispatch(addCourse(course));
+    // Create a new course object without the _id field
+    const newCourse = { ...course };
+    delete newCourse._id; // Remove _id to let reducer generate a unique one
+    
+    // Dispatch the action with the new course
+    dispatch(addCourse(newCourse));
+    
+    // Add debug information
+    console.log("Adding new course:", newCourse);
+    console.log("Current courses:", courses);
+    
+    // Reset form after adding
+    setCourse({
+      _id: "",
+      name: "New Course", 
+      number: "New Number",
+      startDate: "2023-09-10", 
+      endDate: "2023-12-15",
+      department: "D123",  
+      credits: 3,          
+      image: "/images/reactjs.jpg", 
+      description: "New Description"
+    });
+    
+    // Faculty users already see all courses by default
   };
 
   const handleDeleteCourse = (courseId: string) => {
@@ -99,7 +123,7 @@ export default function Dashboard() {
     dispatch(updateCourse(course));
   };
 
-  // 切换显示所有课程或仅显示已注册课程
+  // Toggle between showing all courses or only enrolled courses
   const toggleCourseDisplay = () => {
     setShowAllCourses(!showAllCourses);
   };
@@ -108,7 +132,7 @@ export default function Dashboard() {
     <div id="wd-dashboard">
       <h1 id="wd-dashboard-title">Dashboard</h1> <hr />
       
-      {/* 只有FACULTY角色才能看到新课程表单 */}
+      {/* Only FACULTY role can see the new course form */}
       {isFaculty && (
         <>
           <h5>New Course
@@ -133,7 +157,7 @@ export default function Dashboard() {
           {showAllCourses ? "All Courses" : "My Courses"} ({displayedCourses.length})
         </h2>
         
-        {/* 只有STUDENT角色才能看到Enrollments按钮 */}
+        {/* Only STUDENT role can see the Enrollments button */}
         {isStudent && (
           <button 
             className="btn btn-primary" 
@@ -174,11 +198,12 @@ export default function Dashboard() {
                     </Card.Text>
                     <Button variant="primary">Go</Button>
                     
-                    {/* 只有FACULTY角色才能看到编辑和删除按钮 */}
+                    {/* Only FACULTY role can see edit and delete buttons */}
                     {isFaculty && (
                       <>
                         <button onClick={(event) => {
                           event.preventDefault();
+                          event.stopPropagation(); // Prevent event bubbling to parent element
                           handleDeleteCourse(course._id);
                         }} className="btn btn-danger float-end"
                         id="wd-delete-course-click">
@@ -187,6 +212,7 @@ export default function Dashboard() {
                         <button id="wd-edit-course-click"
                           onClick={(event) => {
                             event.preventDefault();
+                            event.stopPropagation(); // Prevent event bubbling to parent element
                             setCourse({...course});
                           }}
                           className="btn btn-warning me-2 float-end">
@@ -195,7 +221,7 @@ export default function Dashboard() {
                       </>
                     )}
                     
-                    {/* 只有STUDENT角色才能看到注册和退订按钮 */}
+                    {/* Only STUDENT role can see enroll and unenroll buttons */}
                     {isStudent && (
                       isEnrolled(course._id) ? (
                         <button 
