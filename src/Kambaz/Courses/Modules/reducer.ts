@@ -2,6 +2,14 @@ import { createSlice } from "@reduxjs/toolkit";
 import { modules } from "../../Database";
 import { v4 as uuidv4 } from "uuid";
 
+interface Module {
+  _id: string;
+  name: string;
+  course: string;
+  lessons?: any[];
+  editing?: boolean;
+}
+
 const loadInitialState = () => {
   try {
     const savedModules = localStorage.getItem("modules");
@@ -27,7 +35,7 @@ const modulesSlice = createSlice({
   initialState,
   reducers: {
     addModule: (state, { payload: module }) => {
-      const newModule: any = {
+      const newModule: Module = {
         _id: uuidv4(),
         lessons: [],
         name: module.name,

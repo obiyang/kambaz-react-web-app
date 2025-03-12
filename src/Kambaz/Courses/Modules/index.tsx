@@ -73,7 +73,7 @@ export default function Modules() {
               </div>
               {module.lessons && (
                 <ul className="wd-lessons list-group rounded-0">
-                  {module.lessons.map((lesson) => (
+                  {module.lessons.map((lesson: Lesson) => (
                     <li key={lesson._id} className="wd-lesson list-group-item p-3 ps-1">
                       <div className="d-flex align-items-center justify-content-between w-100">
                         <div className="d-flex align-items-center">

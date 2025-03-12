@@ -1,5 +1,4 @@
 import { Routes, Route, Navigate } from "react-router";
-import React from "react";
 import Account from "./Account";
 import Dashboard from "./Dashboard";
 import KambazNavigation from "./Navigation";

@@ -2,7 +2,6 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { FaSearch, FaPlus, FaEllipsisV, FaCheckCircle, FaTrash } from "react-icons/fa";
 import { BsGripVertical } from "react-icons/bs";
 import { MdAssignment } from "react-icons/md";
-import * as db from "../../Database";
 import { useSelector, useDispatch } from "react-redux";
 import { deleteAssignment } from "./reducer";
 import { useState } from "react";
@@ -32,12 +31,6 @@ export default function Assignments() {
   // State for delete confirmation modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
-
-  const handleAssignmentClick = (assignmentId: string) => {
-    if (isFaculty) {
-      navigate(`/Kambaz/Courses/${cid}/Assignments/${assignmentId}`);
-    }
-  };
 
   // Show delete confirmation modal
   const handleShowDeleteModal = (assignmentId: string, e: React.MouseEvent) => {
