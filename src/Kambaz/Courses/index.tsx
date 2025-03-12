@@ -1,17 +1,40 @@
 import CourseNavigation from "./Navigation";
 import { FaAlignJustify } from "react-icons/fa6";
-import { Navigate, Route, Routes, useParams, useLocation } from "react-router";
+import { Navigate, Route, Routes, useParams, useLocation, useNavigate } from "react-router";
 import Modules from "./Modules";
 import Home from "./Home";
 import Assignments from "./Assignments";
 import AssignmentEditor from "./Assignments/Editor";
 import PeopleTable from "./People/table";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
-export default function Courses({ courses }: { courses: any[] }) {
+export default function Courses() {
   const { cid } = useParams();
-  const course = courses.find((course) => course._id === cid);
+  const navigate = useNavigate();
+  const { courses } = useSelector((state: any) => state.coursesReducer);
+  const { enrollments } = useSelector((state: any) => state.enrollmentsReducer);
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const course = courses.find((course: any) => course._id === cid);
   const { pathname } = useLocation();
   const currentScreen = pathname.split("/")[4];
+  
+  // Check if current user is a STUDENT
+  const isStudent = currentUser?.role === "STUDENT";
+  
+  // Check if student is enrolled in this course
+  const isEnrolled = enrollments.some(
+    (enrollment: any) => 
+      enrollment.user === currentUser?._id && 
+      enrollment.course === cid
+  );
+  
+  // If user is a student but not enrolled in this course, redirect to Dashboard
+  useEffect(() => {
+    if (isStudent && !isEnrolled) {
+      navigate("/Kambaz/Dashboard");
+    }
+  }, [isStudent, isEnrolled, navigate]);
 
   return (
     <div id="wd-courses">

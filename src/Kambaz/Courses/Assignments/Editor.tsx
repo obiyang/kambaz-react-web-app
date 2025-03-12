@@ -1,37 +1,85 @@
-import { Form } from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
 import { BsCalendarEvent } from "react-icons/bs";
 import { IoMdClose } from "react-icons/io";
-import { Link, useParams } from "react-router-dom";
-import * as db from "../../Database";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addAssignment, updateAssignment } from "./reducer";
 
 interface Assignment {
   _id: string;
   title: string;
   course: string;
+  description?: string;
+  points?: number;
+  dueDate?: string;
+  availableFromDate?: string;
+  availableUntilDate?: string;
 }
 
 export default function AssignmentEditor() {
   const { cid, aid } = useParams();
-  const assignments = db.assignments as Assignment[];
-  const assignment = assignments.find((a) => a._id === aid && a.course === cid);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
+  
+  const isNewAssignment = aid === "new";
+  
+  const [assignment, setAssignment] = useState<Assignment>({
+    _id: "",
+    title: "",
+    course: cid || "",
+    description: "",
+    points: 100,
+    dueDate: "May 13, 2024, 11:59 PM",
+    availableFromDate: "May 6, 2024, 12:00 AM",
+    availableUntilDate: "May 20, 2024, 11:59 PM"
+  });
 
-  if (!assignment) {
-    return <div>Assignment not found</div>;
-  }
+  useEffect(() => {
+    if (!isNewAssignment && assignments) {
+      const existingAssignment = assignments.find((a: Assignment) => a._id === aid);
+      if (existingAssignment) {
+        setAssignment(existingAssignment);
+      } else {
+        // 如果找不到作业，导航回作业列表
+        navigate(`/Kambaz/Courses/${cid}/Assignments`);
+      }
+    }
+  }, [aid, cid, assignments, isNewAssignment, navigate]);
+
+  const handleSave = () => {
+    if (isNewAssignment) {
+      dispatch(addAssignment(assignment));
+    } else {
+      dispatch(updateAssignment(assignment));
+    }
+    navigate(`/Kambaz/Courses/${cid}/Assignments`);
+  };
+
+  const handleCancel = () => {
+    navigate(`/Kambaz/Courses/${cid}/Assignments`);
+  };
 
   return (
     <div id="wd-assignments-editor" className="p-4">
       <Form>
         <div className="mb-3">
           <Form.Label className="text-secondary">Assignment Name</Form.Label>
-          <Form.Control type="text" defaultValue={assignment.title} />
+          <Form.Control 
+            type="text" 
+            value={assignment.title} 
+            onChange={(e) => setAssignment({...assignment, title: e.target.value})}
+          />
         </div>
 
         <div className="mb-4">
+          <Form.Label className="text-secondary">Description</Form.Label>
           <Form.Control 
             as="textarea" 
             rows={10} 
-            defaultValue="The assignment is available online Submit a link to the landing page of your Web application running on Netlify. The landing page should include the following: Your full name and section Links to each of the Lab assignments Link to the Kambas application Links to all relevant source code repositories The Kanbas application should include a link to navigate back to the landing page." 
+            value={assignment.description} 
+            onChange={(e) => setAssignment({...assignment, description: e.target.value})}
           />
         </div>
 
@@ -40,7 +88,11 @@ export default function AssignmentEditor() {
             <Form.Label className="text-secondary">Points</Form.Label>
           </div>
           <div className="col-8">
-            <Form.Control type="number" defaultValue={100} />
+            <Form.Control 
+              type="number" 
+              value={assignment.points} 
+              onChange={(e) => setAssignment({...assignment, points: parseInt(e.target.value)})}
+            />
           </div>
         </div>
 
@@ -111,7 +163,12 @@ export default function AssignmentEditor() {
               <div className="mb-3">
                 <Form.Label>Due</Form.Label>
                 <div className="d-flex align-items-center">
-                  <Form.Control type="text" defaultValue="May 13, 2024, 11:59 PM" className="me-1" />
+                  <Form.Control 
+                    type="text" 
+                    value={assignment.dueDate} 
+                    className="me-1" 
+                    onChange={(e) => setAssignment({...assignment, dueDate: e.target.value})}
+                  />
                   <BsCalendarEvent />
                 </div>
               </div>
@@ -120,14 +177,24 @@ export default function AssignmentEditor() {
                 <div className="col-6">
                   <Form.Label>Available from</Form.Label>
                   <div className="d-flex align-items-center">
-                    <Form.Control type="text" defaultValue="May 6, 2024, 12:00 AM" className="me-1" />
+                    <Form.Control 
+                      type="text" 
+                      value={assignment.availableFromDate} 
+                      className="me-1" 
+                      onChange={(e) => setAssignment({...assignment, availableFromDate: e.target.value})}
+                    />
                     <BsCalendarEvent />
                   </div>
                 </div>
                 <div className="col-6">
                   <Form.Label>Until</Form.Label>
                   <div className="d-flex align-items-center">
-                    <Form.Control type="text" defaultValue="May 20, 2024, 11:59 PM" className="me-1" />
+                    <Form.Control 
+                      type="text" 
+                      value={assignment.availableUntilDate} 
+                      className="me-1" 
+                      onChange={(e) => setAssignment({...assignment, availableUntilDate: e.target.value})}
+                    />
                     <BsCalendarEvent />
                   </div>
                 </div>
@@ -138,12 +205,12 @@ export default function AssignmentEditor() {
 
         <hr />
         <div className="text-end">
-          <Link to={`/Kambaz/Courses/${cid}/Assignments`} className="btn btn-secondary btn-lg me-2">
+          <Button onClick={handleCancel} className="btn btn-secondary btn-lg me-2">
             Cancel
-          </Link>
-          <Link to={`/Kambaz/Courses/${cid}/Assignments`} className="btn btn-danger btn-lg">
+          </Button>
+          <Button onClick={handleSave} className="btn btn-danger btn-lg">
             Save
-          </Link>
+          </Button>
         </div>
       </Form>
     </div>

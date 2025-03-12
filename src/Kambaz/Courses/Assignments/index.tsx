@@ -1,26 +1,84 @@
-import { Link, useParams } from "react-router-dom";
-import { FaSearch, FaPlus, FaEllipsisV, FaCheckCircle } from "react-icons/fa";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { FaSearch, FaPlus, FaEllipsisV, FaCheckCircle, FaTrash } from "react-icons/fa";
 import { BsGripVertical } from "react-icons/bs";
 import { MdAssignment } from "react-icons/md";
 import * as db from "../../Database";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { deleteAssignment } from "./reducer";
+import { useState } from "react";
+import { Modal, Button } from "react-bootstrap";
 
 interface Assignment {
   _id: string;
   title: string;
   course: string;
+  description?: string;
+  points?: number;
+  dueDate?: string;
+  availableFromDate?: string;
+  availableUntilDate?: string;
 }
 
 export default function Assignments() {
   const { cid } = useParams();
-  const assignments = db.assignments as Assignment[];
-  const courseAssignments = assignments.filter((assignment) => assignment.course === cid);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
+  const courseAssignments = assignments ? assignments.filter((assignment: Assignment) => assignment.course === cid) : [];
   
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const isFaculty = currentUser?.role === "FACULTY";
 
+  // State for delete confirmation modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
+
+  const handleAssignmentClick = (assignmentId: string) => {
+    if (isFaculty) {
+      navigate(`/Kambaz/Courses/${cid}/Assignments/${assignmentId}`);
+    }
+  };
+
+  // Show delete confirmation modal
+  const handleShowDeleteModal = (assignmentId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event bubbling
+    setAssignmentToDelete(assignmentId);
+    setShowDeleteModal(true);
+  };
+
+  // Confirm delete assignment
+  const handleDeleteAssignment = () => {
+    if (assignmentToDelete) {
+      dispatch(deleteAssignment(assignmentToDelete));
+      setShowDeleteModal(false);
+      setAssignmentToDelete(null);
+    }
+  };
+
+  // Cancel delete
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setAssignmentToDelete(null);
+  };
+
   return (
     <div id="wd-assignments" className="p-2">
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={handleCancelDelete}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this assignment?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCancelDelete}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDeleteAssignment}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       {/* Search and Buttons Row */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div className="position-relative">
@@ -39,7 +97,11 @@ export default function Assignments() {
             <button id="wd-add-assignment-group" className="btn btn-light me-2">
               <FaPlus className="me-1" />Group
             </button>
-            <button id="wd-add-assignment" className="btn btn-danger">
+            <button 
+              id="wd-add-assignment" 
+              className="btn btn-danger"
+              onClick={() => navigate(`/Kambaz/Courses/${cid}/Assignments/new`)}
+            >
               <FaPlus className="me-1" />Assignment
             </button>
           </div>
@@ -64,31 +126,49 @@ export default function Assignments() {
 
       {/* Assignments List */}
       <ul id="wd-assignment-list" className="list-unstyled border-start border-success border-4 ps-1 fs-5">
-        {courseAssignments.map((assignment) => (
+        {courseAssignments.map((assignment: Assignment) => (
           <li key={assignment._id} className="wd-assignment-item mb-3">
             <div className="d-flex align-items-center">
               <BsGripVertical className="me-2 fs-3" />
               <MdAssignment className="me-2 text-success fs-3" />
               <div className="flex-grow-1">
-                <Link 
-                  to={assignment._id} 
-                  className="wd-assignment-link mb-1 d-block"
-                >
-                  {assignment.title}
-                </Link>
+                {isFaculty ? (
+                  <Link 
+                    to={`/Kambaz/Courses/${cid}/Assignments/${assignment._id}`} 
+                    className="wd-assignment-link mb-1 d-block"
+                  >
+                    {assignment.title}
+                  </Link>
+                ) : (
+                  <span className="mb-1 d-block">{assignment.title}</span>
+                )}
                 <div className="d-flex align-items-center text-secondary fs-6">
                   <span className="text-danger">Multiple Modules</span>
                   <span className="mx-2">|</span>
-                  <span>Not available until May 6 at 12:00am</span>
+                  <span>
+                    {assignment.availableFromDate 
+                      ? `Not available until ${assignment.availableFromDate}` 
+                      : "Not available until May 6 at 12:00am"}
+                  </span>
                 </div>
                 <div className="text-secondary fs-6">
-                  Due May 13 at 11:59pm | 100 pts
+                  {assignment.dueDate ? `Due ${assignment.dueDate}` : "Due May 13 at 11:59pm"} | 
+                  {assignment.points ? `${assignment.points} pts` : "100 pts"}
                 </div>
               </div>
               <div className="d-flex align-items-center me-4">
                 <FaCheckCircle className="text-success me-3 fs-5" />
                 
-                {isFaculty && <FaEllipsisV className="text-dark fs-5" />}
+                {isFaculty && (
+                  <>
+                    <FaTrash 
+                      className="text-danger me-2 fs-5" 
+                      onClick={(e) => handleShowDeleteModal(assignment._id, e)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <FaEllipsisV className="text-dark fs-5" />
+                  </>
+                )}
               </div>
             </div>
           </li>
