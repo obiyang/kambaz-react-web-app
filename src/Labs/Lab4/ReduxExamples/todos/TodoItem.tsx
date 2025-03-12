@@ -2,7 +2,12 @@ import { Button } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { deleteTodo, setTodo } from "./todosReducer";
 
-export default function TodoItem({ todo }) {
+interface Todo {
+  id: string;
+  title: string;
+}
+
+export default function TodoItem({ todo }: { todo: Todo }) {
   const dispatch = useDispatch();
   return (
     <div className="d-flex p-2 border-bottom align-items-center">
