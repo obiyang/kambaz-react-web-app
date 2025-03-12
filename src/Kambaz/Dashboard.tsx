@@ -89,8 +89,7 @@ export default function Dashboard() {
 
   const handleAddNewCourse = () => {
     // Create a new course object without the _id field
-    const newCourse = { ...course };
-    delete newCourse._id; // Remove _id to let reducer generate a unique one
+    const { _id, ...newCourse } = course; // Use object destructuring to exclude _id
     
     // Dispatch the action with the new course
     dispatch(addCourse(newCourse));
