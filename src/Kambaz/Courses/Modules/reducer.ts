@@ -14,7 +14,7 @@ const loadInitialState = () => {
 
 const initialState = loadInitialState();
 
-const saveToLocalStorage = (modules) => {
+const saveToLocalStorage = (modules: any[]) => {
   try {
     localStorage.setItem("modules", JSON.stringify(modules));
   } catch (error) {

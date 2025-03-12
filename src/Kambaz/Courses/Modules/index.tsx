@@ -1,11 +1,9 @@
 import { BsGripVertical } from "react-icons/bs";
 import { useParams } from "react-router";
-import * as db from "../../Database";
 import LessonControlButtons from "./LessonControlButtons";
 import ModulesControls from "./ModulesControls";
 import ModuleControlButtons from "./ModuleControlButtons";
 import { useState } from "react";
-import { v4 as uuidv4 } from 'uuid';
 import { FormControl } from "react-bootstrap";
 import { addModule, editModule, updateModule, deleteModule }
   from "./reducer";
@@ -15,14 +13,6 @@ interface Lesson {
   _id: string;
   name: string;
   module: string;
-}
-
-interface Module {
-  _id: string;
-  name: string;
-  course: string;
-  lessons?: Lesson[];
-  editing?: boolean; 
 }
 
 export default function Modules() {

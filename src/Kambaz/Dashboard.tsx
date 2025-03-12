@@ -1,8 +1,7 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, Button, FormControl } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
-import * as db from "./Database";
 import { addCourse, deleteCourse, updateCourse } from "./Courses/reducer";
 import { enrollCourse, unenrollCourse } from "./Enrollments/reducer";
 
@@ -123,7 +122,7 @@ export default function Dashboard() {
           </h5><br />
           <FormControl value={course.name} className="mb-2"
                 onChange={(e) => setCourse({ ...course, name: e.target.value })} />
-          <FormControl value={course.description} rows={3}
+          <FormControl value={course.description} as="textarea" 
                 onChange={(e) => setCourse({ ...course, description: e.target.value })} />
           <hr />
         </>
