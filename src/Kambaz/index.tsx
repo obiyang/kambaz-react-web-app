@@ -14,7 +14,7 @@ export default function Kambaz() {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
 
   useEffect(() => {
-
+    // Only fetch courses if currentUser exists
     if (currentUser) {
       userClient.findMyCourses().catch(error => {
         console.error(error);
