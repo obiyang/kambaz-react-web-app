@@ -6,25 +6,21 @@ import Courses from "./Courses";
 import "./styles.css";
 import ProtectedRoute from "./Account/ProtectedRoute";
 import Session from "./Account/Session";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import * as userClient from "./Account/client";
 
 export default function Kambaz() {
-  const [courses, setCourses] = useState<any[]>([]);
   const { currentUser } = useSelector((state: any) => state.accountReducer);
 
-  const fetchCourses = async () => {
-    try {
-      const courses = await userClient.findMyCourses();
-      setCourses(courses);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  
   useEffect(() => {
-    fetchCourses();
+    // 只在用户状态变化时获取课程信息，但不存储在组件状态中
+    // 因为这些数据已经在 Redux 中管理
+    if (currentUser) {
+      userClient.findMyCourses().catch(error => {
+        console.error(error);
+      });
+    }
   }, [currentUser]);
 
   return (
