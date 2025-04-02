@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { FormControl, Button } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { FormControl, Button, Form } from "react-bootstrap";
 import * as client from "./client";
+
 export default function WorkingWithObjectsAsynchronously() {
   const [assignment, setAssignment] = useState<any>({});
   const fetchAssignment = async () => {
@@ -22,7 +23,7 @@ export default function WorkingWithObjectsAsynchronously() {
       <h4>Assignment</h4>
       <FormControl defaultValue={assignment.title} className="mb-2"
         onChange={(e) => setAssignment({ ...assignment, title: e.target.value }) } />
-      <FormControl rows={3} defaultValue={assignment.description} className="mb-2"
+      <Form.Control as="textarea" rows={3} defaultValue={assignment.description} className="mb-2"
         onChange={(e) => setAssignment({ ...assignment, description: e.target.value }) }/>
       <FormControl type="date" className="mb-2" defaultValue={assignment.due}
         onChange={(e) => setAssignment({ ...assignment, due: e.target.value })} />
@@ -40,4 +41,5 @@ export default function WorkingWithObjectsAsynchronously() {
       <pre>{JSON.stringify(assignment, null, 2)}</pre>
       <hr />
     </div>
-);}
+  );
+}

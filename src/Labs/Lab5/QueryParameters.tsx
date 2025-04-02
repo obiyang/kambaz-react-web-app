@@ -2,8 +2,8 @@ import { useState } from "react";
 import { FormControl } from "react-bootstrap";
 
 function QueryParameters() {
-  const [a, setA] = useState(10);
-  const [b, setB] = useState(20);
+  const [a, setA] = useState<number>(10);
+  const [b, setB] = useState<number>(20);
   const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER;
 
   return (
@@ -12,11 +12,11 @@ function QueryParameters() {
       <FormControl id="wd-query-parameter-a"
             className="mb-2"
             defaultValue={a} type="number"
-            onChange={(e) => setA(e.target.value)} />
+            onChange={(e) => setA(parseInt(e.target.value) || 0)} />
       <FormControl id="wd-query-parameter-b"
             className="mb-2"
             defaultValue={b} type="number"
-            onChange={(e) => setB(e.target.value)} />
+            onChange={(e) => setB(parseInt(e.target.value) || 0)} />
       <a className="btn btn-primary me-2" id="wd-query-parameter-add"
         href={`${REMOTE_SERVER}/lab5/calculator?operation=add&a=${a}&b=${b}`}>
         Add {a} + {b}
