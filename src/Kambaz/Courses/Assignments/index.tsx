@@ -74,11 +74,6 @@ export default function Assignments() {
     setAssignmentToDelete(null);
   };
 
-  // Navigate to assignment details
-  const handleAssignmentClick = (assignmentId: string) => {
-    navigate(`/Kambaz/Courses/${cid}/Assignments/${assignmentId}`);
-  };
-
   return (
     <div id="wd-assignments" className="p-2">
       {/* Delete Confirmation Modal */}
