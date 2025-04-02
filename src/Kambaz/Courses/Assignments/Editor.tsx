@@ -5,6 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addAssignment, updateAssignment } from "./reducer";
+import * as client from "./client";
 
 interface Assignment {
   _id: string;
@@ -37,179 +38,149 @@ export default function AssignmentEditor() {
   });
 
   useEffect(() => {
-    if (!isNewAssignment && assignments) {
-      const existingAssignment = assignments.find((a: Assignment) => a._id === aid);
-      if (existingAssignment) {
-        setAssignment(existingAssignment);
-      } else {
-        // 如果找不到作业，导航回作业列表
-        navigate(`/Kambaz/Courses/${cid}/Assignments`);
+    const fetchAssignment = async () => {
+      if (!isNewAssignment && aid) {
+        try {
+          const fetchedAssignment = await client.findAssignmentById(aid);
+          setAssignment(fetchedAssignment);
+        } catch (error) {
+          console.error("Error fetching assignment:", error);
+          // If assignment not found in API, try to find it in Redux store
+          const foundAssignment = assignments.find((a: Assignment) => a._id === aid);
+          if (foundAssignment) {
+            setAssignment(foundAssignment);
+          }
+        }
       }
-    }
-  }, [aid, cid, assignments, isNewAssignment, navigate]);
+    };
+    fetchAssignment();
+  }, [aid, isNewAssignment, assignments]);
 
-  const handleSave = () => {
-    if (isNewAssignment) {
-      dispatch(addAssignment(assignment));
-    } else {
-      dispatch(updateAssignment(assignment));
-    }
-    navigate(`/Kambaz/Courses/${cid}/Assignments`);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setAssignment({
+      ...assignment,
+      [name]: name === "points" ? parseInt(value) || 0 : value
+    });
   };
 
   const handleCancel = () => {
     navigate(`/Kambaz/Courses/${cid}/Assignments`);
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      if (isNewAssignment) {
+        // Create new assignment
+        const newAssignment = await client.createAssignment(cid as string, assignment);
+        dispatch(addAssignment(newAssignment));
+      } else {
+        // Update existing assignment
+        const updatedAssignment = await client.updateAssignment(assignment);
+        dispatch(updateAssignment(updatedAssignment));
+      }
+      navigate(`/Kambaz/Courses/${cid}/Assignments`);
+    } catch (error) {
+      console.error("Error saving assignment:", error);
+    }
+  };
+
   return (
-    <div id="wd-assignments-editor" className="p-4">
-      <Form>
-        <div className="mb-3">
-          <Form.Label className="text-secondary">Assignment Name</Form.Label>
-          <Form.Control 
-            type="text" 
-            value={assignment.title} 
-            onChange={(e) => setAssignment({...assignment, title: e.target.value})}
-          />
-        </div>
+    <div className="container-fluid mt-3">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2>{isNewAssignment ? "New Assignment" : "Edit Assignment"}</h2>
+        <Button variant="outline-secondary" onClick={handleCancel}>
+          <IoMdClose className="me-2" />
+          Cancel
+        </Button>
+      </div>
 
-        <div className="mb-4">
-          <Form.Label className="text-secondary">Description</Form.Label>
-          <Form.Control 
-            as="textarea" 
-            rows={10} 
-            value={assignment.description} 
-            onChange={(e) => setAssignment({...assignment, description: e.target.value})}
+      <Form onSubmit={handleSubmit}>
+        <Form.Group className="mb-3">
+          <Form.Label>Assignment Name</Form.Label>
+          <Form.Control
+            type="text"
+            name="title"
+            value={assignment.title}
+            onChange={handleChange}
+            placeholder="Enter assignment name"
+            required
           />
-        </div>
+        </Form.Group>
 
-        <div className="row mb-3">
-          <div className="col-4 text-end">
-            <Form.Label className="text-secondary">Points</Form.Label>
-          </div>
-          <div className="col-8">
-            <Form.Control 
-              type="number" 
-              value={assignment.points} 
-              onChange={(e) => setAssignment({...assignment, points: parseInt(e.target.value)})}
+        <Form.Group className="mb-3">
+          <Form.Label>Description</Form.Label>
+          <Form.Control
+            as="textarea"
+            name="description"
+            value={assignment.description}
+            onChange={handleChange}
+            rows={4}
+            placeholder="Enter assignment description"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label>Points</Form.Label>
+          <Form.Control
+            type="number"
+            name="points"
+            value={assignment.points}
+            onChange={handleChange}
+            min="0"
+            max="1000"
+          />
+        </Form.Group>
+
+        <div className="row">
+          <Form.Group className="col-md-4 mb-3">
+            <Form.Label>
+              <BsCalendarEvent className="me-2" />
+              Due Date
+            </Form.Label>
+            <Form.Control
+              type="date"
+              name="dueDate"
+              value={assignment.dueDate}
+              onChange={handleChange}
             />
-          </div>
+          </Form.Group>
+
+          <Form.Group className="col-md-4 mb-3">
+            <Form.Label>
+              <BsCalendarEvent className="me-2" />
+              Available From
+            </Form.Label>
+            <Form.Control
+              type="date"
+              name="availableFromDate"
+              value={assignment.availableFromDate}
+              onChange={handleChange}
+            />
+          </Form.Group>
+
+          <Form.Group className="col-md-4 mb-3">
+            <Form.Label>
+              <BsCalendarEvent className="me-2" />
+              Available Until
+            </Form.Label>
+            <Form.Control
+              type="date"
+              name="availableUntilDate"
+              value={assignment.availableUntilDate}
+              onChange={handleChange}
+            />
+          </Form.Group>
         </div>
 
-        <div className="row mb-3">
-          <div className="col-4 text-end">
-            <Form.Label className="text-secondary">Assignment Group</Form.Label>
-          </div>
-          <div className="col-8">
-            <Form.Select defaultValue="ASSIGNMENTS">
-              <option>ASSIGNMENTS</option>
-              <option>QUIZZES</option>
-              <option>EXAMS</option>
-              <option>PROJECT</option>
-            </Form.Select>
-          </div>
-        </div>
-
-        <div className="row mb-3">
-          <div className="col-4 text-end">
-            <Form.Label className="text-secondary">Display Grade as</Form.Label>
-          </div>
-          <div className="col-8">
-            <Form.Select defaultValue="Percentage">
-              <option>Percentage</option>
-              <option>Letter</option>
-              <option>Pass/Fail</option>
-            </Form.Select>
-          </div>
-        </div>
-
-        <div className="row mb-3">
-          <div className="col-4 text-end">
-            <Form.Label className="text-secondary">Submission Type</Form.Label>
-          </div>
-          <div className="col-8">
-            <div className="border rounded p-3">
-              <Form.Select className="mb-3" defaultValue="Online">
-                <option>Online</option>
-                <option>In-person</option>
-              </Form.Select>
-
-              <Form.Label className="fw-bold">Online Entry Options</Form.Label>
-              <div className="mt-2">
-                <Form.Check type="checkbox" label="Text Entry" className="mb-2" />
-                <Form.Check type="checkbox" label="Website URL" className="mb-2" defaultChecked />
-                <Form.Check type="checkbox" label="Media Recordings" className="mb-2" />
-                <Form.Check type="checkbox" label="Student Annotation" className="mb-2" />
-                <Form.Check type="checkbox" label="File Uploads" className="mb-2" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="row mb-3">
-          <div className="col-4 text-end">
-            <Form.Label className="text-secondary">Assign</Form.Label>
-          </div>
-          <div className="col-8">
-            <div className="border rounded p-3">
-              <div className="mb-3">
-                <Form.Label>Assign to</Form.Label>
-                <div className="d-flex align-items-center border rounded p-1 mt-1" style={{ width: "fit-content" }}>
-                  <span>Everyone</span>
-                  <IoMdClose className="ms-2" />
-                </div>
-              </div>
-
-              <div className="mb-3">
-                <Form.Label>Due</Form.Label>
-                <div className="d-flex align-items-center">
-                  <Form.Control 
-                    type="text" 
-                    value={assignment.dueDate} 
-                    className="me-1" 
-                    onChange={(e) => setAssignment({...assignment, dueDate: e.target.value})}
-                  />
-                  <BsCalendarEvent />
-                </div>
-              </div>
-
-              <div className="row">
-                <div className="col-6">
-                  <Form.Label>Available from</Form.Label>
-                  <div className="d-flex align-items-center">
-                    <Form.Control 
-                      type="text" 
-                      value={assignment.availableFromDate} 
-                      className="me-1" 
-                      onChange={(e) => setAssignment({...assignment, availableFromDate: e.target.value})}
-                    />
-                    <BsCalendarEvent />
-                  </div>
-                </div>
-                <div className="col-6">
-                  <Form.Label>Until</Form.Label>
-                  <div className="d-flex align-items-center">
-                    <Form.Control 
-                      type="text" 
-                      value={assignment.availableUntilDate} 
-                      className="me-1" 
-                      onChange={(e) => setAssignment({...assignment, availableUntilDate: e.target.value})}
-                    />
-                    <BsCalendarEvent />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <hr />
-        <div className="text-end">
-          <Button onClick={handleCancel} className="btn btn-secondary btn-lg me-2">
+        <div className="d-flex justify-content-end mt-4">
+          <Button variant="secondary" className="me-2" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button onClick={handleSave} className="btn btn-danger btn-lg">
-            Save
+          <Button variant="success" type="submit">
+            {isNewAssignment ? "Create Assignment" : "Update Assignment"}
           </Button>
         </div>
       </Form>

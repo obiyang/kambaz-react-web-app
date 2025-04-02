@@ -3,9 +3,10 @@ import { FaSearch, FaPlus, FaEllipsisV, FaCheckCircle, FaTrash } from "react-ico
 import { BsGripVertical } from "react-icons/bs";
 import { MdAssignment } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteAssignment } from "./reducer";
-import { useState } from "react";
+import { deleteAssignment, setAssignments } from "./reducer";
+import { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
+import * as client from "./client";
 
 interface Assignment {
   _id: string;
@@ -23,7 +24,6 @@ export default function Assignments() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { assignments } = useSelector((state: any) => state.assignmentsReducer);
-  const courseAssignments = assignments ? assignments.filter((assignment: Assignment) => assignment.course === cid) : [];
   
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const isFaculty = currentUser?.role === "FACULTY";
@@ -31,6 +31,21 @@ export default function Assignments() {
   // State for delete confirmation modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
+
+  // Fetch assignments when component mounts or course ID changes
+  useEffect(() => {
+    const fetchAssignments = async () => {
+      try {
+        if (cid) {
+          const assignments = await client.findAssignmentsForCourse(cid);
+          dispatch(setAssignments(assignments));
+        }
+      } catch (error) {
+        console.error("Error fetching assignments:", error);
+      }
+    };
+    fetchAssignments();
+  }, [cid, dispatch]);
 
   // Show delete confirmation modal
   const handleShowDeleteModal = (assignmentId: string, e: React.MouseEvent) => {
@@ -40,11 +55,16 @@ export default function Assignments() {
   };
 
   // Confirm delete assignment
-  const handleDeleteAssignment = () => {
+  const handleDeleteAssignment = async () => {
     if (assignmentToDelete) {
-      dispatch(deleteAssignment(assignmentToDelete));
-      setShowDeleteModal(false);
-      setAssignmentToDelete(null);
+      try {
+        await client.deleteAssignment(assignmentToDelete);
+        dispatch(deleteAssignment(assignmentToDelete));
+        setShowDeleteModal(false);
+        setAssignmentToDelete(null);
+      } catch (error) {
+        console.error("Error deleting assignment:", error);
+      }
     }
   };
 
@@ -52,6 +72,11 @@ export default function Assignments() {
   const handleCancelDelete = () => {
     setShowDeleteModal(false);
     setAssignmentToDelete(null);
+  };
+
+  // Navigate to assignment details
+  const handleAssignmentClick = (assignmentId: string) => {
+    navigate(`/Kambaz/Courses/${cid}/Assignments/${assignmentId}`);
   };
 
   return (
@@ -119,7 +144,7 @@ export default function Assignments() {
 
       {/* Assignments List */}
       <ul id="wd-assignment-list" className="list-unstyled border-start border-success border-4 ps-1 fs-5">
-        {courseAssignments.map((assignment: Assignment) => (
+        {assignments.map((assignment: Assignment) => (
           <li key={assignment._id} className="wd-assignment-item mb-3">
             <div className="d-flex align-items-center">
               <BsGripVertical className="me-2 fs-3" />

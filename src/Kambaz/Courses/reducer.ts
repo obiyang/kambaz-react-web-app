@@ -29,13 +29,32 @@ const coursesSlice = createSlice({
   name: "courses",
   initialState,
   reducers: {
+    setCourses: (state, { payload: courses }) => {
+      console.log("Setting courses from server:", courses);
+      
+      // 完全替换课程数据，而不是添加到现有数据
+      state.courses = [...courses];
+      
+      // 清除 localStorage 中的课程数据，然后保存新数据
+      localStorage.removeItem("courses");
+      saveToLocalStorage(state.courses);
+      
+      console.log("Updated courses state with server data:", state.courses);
+    },
     addCourse: (state, { payload: course }) => {
-      const newId = uuidv4();
-      console.log("Generated new course ID:", newId);
+      // 如果课程已经存在（基于 _id），则不添加
+      if (state.courses.some((c: any) => c._id === course._id)) {
+        console.log("Course already exists, not adding:", course);
+        return;
+      }
+      
+      // 使用服务器提供的 ID，如果没有则生成新的 ID
+      const courseId = course._id || uuidv4();
+      console.log("Using course ID:", courseId);
       
       const newCourse: any = {
         ...course,
-        _id: newId,
+        _id: courseId,
       };
       
       console.log("Adding new course to state:", newCourse);
@@ -71,6 +90,6 @@ const coursesSlice = createSlice({
   },
 });
 
-export const { addCourse, deleteCourse, updateCourse, editCourse } =
+export const { addCourse, deleteCourse, updateCourse, editCourse, setCourses } =
   coursesSlice.actions;
 export default coursesSlice.reducer;

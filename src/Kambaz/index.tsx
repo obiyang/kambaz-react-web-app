@@ -5,14 +5,67 @@ import KambazNavigation from "./Navigation";
 import Courses from "./Courses";
 import "./styles.css";
 import ProtectedRoute from "./Account/ProtectedRoute";
+import Session from "./Account/Session";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import * as userClient from "./Account/client";
+import * as courseClient from "./Courses/client";
+
 
 export default function Kambaz() {
+  const [courses, setCourses] = useState<any[]>([]);
+  const [course, setCourse] = useState<any>({
+    name: "New Course", 
+    number: "New Number",
+    startDate: "2023-09-10", 
+    endDate: "2023-12-15",
+    department: "D123",
+    credits: 3,
+    image: "/images/reactjs.jpg", 
+    description: "New Description"
+  });
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const dispatch = useDispatch();
+
+  const addNewCourse = async () => {
+    const newCourse = await userClient.createCourse(course);
+    setCourses([...courses, newCourse]);
+  };
+
+  const deleteCourse = async (courseId: string) => {
+    const status = await courseClient.deleteCourse(courseId);
+    setCourses(courses.filter((course) => course._id !== courseId));
+  };
+
+  const updateCourse = async () => {
+    await courseClient.updateCourse(course);
+    setCourses(courses.map((c) => {
+        if (c._id === course._id) { return course; }
+        else { return c; }
+    }));
+  };
+
+
+  const fetchCourses = async () => {
+    try {
+      const courses = await userClient.findMyCourses();
+      setCourses(courses);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    fetchCourses();
+  }, [currentUser]);
+
+
   return (
-    <div id="wd-kambaz">
-      <KambazNavigation />
-      <div className="wd-main-content-offset p-3">
-        <Routes>
-          <Route path="/" element={<Navigate to="Dashboard" />} />
+    <Session>
+      <div id="wd-kambaz">
+        <KambazNavigation />
+        <div className="wd-main-content-offset p-3">
+          <Routes>
+            <Route path="/" element={<Navigate to="Dashboard" />} />
           <Route path="Account/*" element={<Account />} />
           <Route path="Dashboard" element={
             <ProtectedRoute>
@@ -29,5 +82,6 @@ export default function Kambaz() {
         </Routes>
       </div>
     </div>
+    </Session>
   );
 }

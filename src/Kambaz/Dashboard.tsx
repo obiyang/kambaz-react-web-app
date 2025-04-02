@@ -82,10 +82,7 @@ export default function Dashboard() {
     navigate(`/Kambaz/Courses/${courseId}/Home`);
   };
 
-  // Select courses to display based on display mode
-  const displayedCourses = showAllCourses 
-    ? courses 
-    : courses.filter((course: any) => isEnrolled(course._id));
+  const displayedCourses = showAllCourses ? courses : courses.filter((course: any) => isEnrolled(course._id));
 
   const handleAddNewCourse = () => {
     // Create a new course object without the _id field
