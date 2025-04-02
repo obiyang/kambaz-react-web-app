@@ -14,8 +14,7 @@ export default function Kambaz() {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
 
   useEffect(() => {
-    // 只在用户状态变化时获取课程信息，但不存储在组件状态中
-    // 因为这些数据已经在 Redux 中管理
+
     if (currentUser) {
       userClient.findMyCourses().catch(error => {
         console.error(error);
