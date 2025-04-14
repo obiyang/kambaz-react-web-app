@@ -4,7 +4,7 @@ import { useParams } from "react-router";
 import * as client from "./client";
 import { FormControl } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
-//import PeopleTable from "../Courses/People/Table";
+import PeopleTable from "../Courses/People/Table";
 
 export default function Users() {
   const [users, setUsers] = useState<any[]>([]);
