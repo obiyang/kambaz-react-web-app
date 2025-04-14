@@ -1,7 +1,9 @@
 import { Table } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
-import { useParams } from "react-router-dom";
-import * as db from "../../Database";
+import { useState, useEffect } from "react";
+import * as userClient from "../../Account/client";
+import { Link } from "react-router-dom";
+import PeopleDetails from "./Details";
 
 interface User {
   _id: string;
@@ -14,19 +16,29 @@ interface User {
   totalActivity: string;
 }
 
-interface Enrollment {
-  _id: string;
-  user: string;
-  course: string;
-}
-
-export default function PeopleTable() {
-  const { cid } = useParams();
-  const users = db.users as User[];
-  const enrollments = db.enrollments as Enrollment[];
+export default function PeopleTable({ users = [] }: { users?: any[] }) {
+  const [localUsers, setLocalUsers] = useState<User[]>([]);
+  
+  useEffect(() => {
+    // If users are not provided, fetch them from the server
+    if (users.length === 0) {
+      const fetchUsers = async () => {
+        try {
+          const fetchedUsers = await userClient.findAllUsers();
+          setLocalUsers(fetchedUsers);
+        } catch (error) {
+          console.error("Error fetching users:", error);
+        }
+      };
+      fetchUsers();
+    } else {
+      setLocalUsers(users);
+    }
+  }, [users]);
 
   return (
     <div id="wd-people-table">
+      <PeopleDetails />
       <Table striped>
         <thead>
           <tr>
@@ -39,27 +51,22 @@ export default function PeopleTable() {
           </tr>
         </thead>
         <tbody>
-          {users
-            .filter((usr) =>
-              enrollments.some(
-                (enrollment) =>
-                  enrollment.user === usr._id && enrollment.course === cid
-              )
-            )
-            .map((user) => (
-              <tr key={user._id}>
-                <td className="wd-full-name text-nowrap">
+          {localUsers.map((user) => (
+            <tr key={user._id}>
+              <td className="wd-full-name text-nowrap">
+                <Link to={`/Kambaz/Account/Users/${user._id}`} className="text-decoration-none">
                   <FaUserCircle className="me-2 fs-1 text-secondary" />
                   <span className="wd-first-name">{user.firstName}</span>{" "}
                   <span className="wd-last-name">{user.lastName}</span>
-                </td>
-                <td className="wd-login-id">{user.loginId}</td>
-                <td className="wd-section">{user.section}</td>
-                <td className="wd-role">{user.role}</td>
-                <td className="wd-last-activity">{user.lastActivity}</td>
-                <td className="wd-total-activity">{user.totalActivity}</td>
-              </tr>
-            ))}
+                </Link>
+              </td>
+              <td className="wd-login-id">{user.loginId}</td>
+              <td className="wd-section">{user.section}</td>
+              <td className="wd-role">{user.role}</td>
+              <td className="wd-last-activity">{user.lastActivity}</td>
+              <td className="wd-total-activity">{user.totalActivity}</td>
+            </tr>
+          ))}
         </tbody>
       </Table>
     </div>
