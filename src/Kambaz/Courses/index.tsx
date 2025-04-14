@@ -5,7 +5,7 @@ import Modules from "./Modules";
 import Home from "./Home";
 import Assignments from "./Assignments";
 import AssignmentEditor from "./Assignments/Editor";
-import PeopleTable from "./People/Table";
+import PeopleTable from "./People/table";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 
