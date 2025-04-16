@@ -4,6 +4,7 @@ import { IoCloseSharp } from "react-icons/io5";
 import { useParams, useNavigate } from "react-router";
 import * as client from "../../Account/client";
 import { FormControl, Form } from "react-bootstrap";
+import { useSelector } from "react-redux";
 
 export default function PeopleDetails() {
   const { uid } = useParams();
@@ -16,6 +17,12 @@ export default function PeopleDetails() {
   const [editingRole, setEditingRole] = useState(false);
   const navigate = useNavigate();
   
+  // 获取当前登录用户
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  
+  // 检查当前用户是否为ADMIN
+  const isAdmin = currentUser?.role === "ADMIN";
+  
   const fetchUser = async () => {
     if (!uid) return;
     const user = await client.findUserById(uid);
@@ -25,6 +32,12 @@ export default function PeopleDetails() {
   };
   
   const deleteUser = async (userId: string) => {
+    // 只有ADMIN才能删除用户
+    if (!isAdmin) {
+      alert("只有管理员可以删除用户");
+      return;
+    }
+    
     if (window.confirm("Are you sure you want to delete this user?")) {
       await client.deleteUser(userId);
       navigate(-1);
@@ -32,6 +45,12 @@ export default function PeopleDetails() {
   };
   
   const saveUser = async () => {
+    // 只有ADMIN才能保存用户信息
+    if (!isAdmin) {
+      alert("只有管理员可以编辑用户信息");
+      return;
+    }
+    
     const [firstName, lastName] = name.split(" ");
     const updatedUser = { ...user, firstName, lastName };
     await client.updateUser(updatedUser);
@@ -41,6 +60,12 @@ export default function PeopleDetails() {
   };
   
   const saveEmail = async () => {
+    // 只有ADMIN才能保存邮箱
+    if (!isAdmin) {
+      alert("只有管理员可以编辑用户邮箱");
+      return;
+    }
+    
     const updatedUser = { ...user, email };
     await client.updateUser(updatedUser);
     setUser(updatedUser);
@@ -48,6 +73,12 @@ export default function PeopleDetails() {
   };
   
   const saveRole = async () => {
+    // 只有ADMIN才能保存角色
+    if (!isAdmin) {
+      alert("只有管理员可以编辑用户角色");
+      return;
+    }
+    
     const updatedUser = { ...user, role };
     await client.updateUser(updatedUser);
     setUser(updatedUser);
@@ -73,17 +104,17 @@ export default function PeopleDetails() {
       </div>
       <hr />
       <div className="text-danger fs-4">
-        {!editing && (
+        {!editing && isAdmin && (
           <FaPen onClick={() => setEditing(true)}
               className="float-end fs-5 mt-2 wd-edit" /> )}
-        {editing && (
+        {editing && isAdmin && (
           <FaCheck onClick={() => saveUser()}
               className="float-end fs-5 mt-2 me-2 wd-save" /> )}
         {!editing && (
-          <div className="wd-name"
-               onClick={() => setEditing(true)}>
+          <div className={`wd-name ${isAdmin ? "cursor-pointer" : ""}`}
+               onClick={() => isAdmin && setEditing(true)}>
             {user.firstName} {user.lastName}</div>)}
-        {user && editing && (
+        {user && editing && isAdmin && (
           <FormControl className="w-50 wd-edit-name"
             defaultValue={`${user.firstName} ${user.lastName}`}
             onChange={(e) => setName(e.target.value)}
@@ -93,19 +124,19 @@ export default function PeopleDetails() {
       
       <div className="mt-3">
         <b>Roles:</b>
-        {!editingRole && (
+        {!editingRole && isAdmin && (
           <FaPen onClick={() => setEditingRole(true)}
               className="float-end fs-5 wd-edit-role" /> )}
-        {editingRole && (
+        {editingRole && isAdmin && (
           <FaCheck onClick={() => saveRole()}
               className="float-end fs-5 me-2 wd-save-role" /> )}
         {!editingRole && (
-          <span className="wd-roles"
-                onClick={() => setEditingRole(true)}>
+          <span className={`wd-roles ${isAdmin ? "cursor-pointer" : ""}`}
+                onClick={() => isAdmin && setEditingRole(true)}>
             {user.role}
           </span>
         )}
-        {editingRole && (
+        {editingRole && isAdmin && (
           <Form.Select 
             className="mt-1 w-50 wd-edit-role-select"
             value={role}
@@ -122,19 +153,19 @@ export default function PeopleDetails() {
       
       <div>
         <b>Email:</b>
-        {!editingEmail && (
+        {!editingEmail && isAdmin && (
           <FaPen onClick={() => setEditingEmail(true)}
               className="float-end fs-5 wd-edit-email" /> )}
-        {editingEmail && (
+        {editingEmail && isAdmin && (
           <FaCheck onClick={() => saveEmail()}
               className="float-end fs-5 me-2 wd-save-email" /> )}
         {!editingEmail && (
-          <span className="wd-email"
-                onClick={() => setEditingEmail(true)}>
+          <span className={`wd-email ${isAdmin ? "cursor-pointer" : ""}`}
+                onClick={() => isAdmin && setEditingEmail(true)}>
             {user.email || "N/A"}
           </span>
         )}
-        {editingEmail && (
+        {editingEmail && isAdmin && (
           <FormControl 
             type="email"
             className="mt-1 w-75 wd-edit-email-input"
@@ -156,18 +187,30 @@ export default function PeopleDetails() {
       <span className="wd-total-activity">{user.totalActivity}</span>
       
       <hr />
-      <button 
-        onClick={() => deleteUser(uid as string)} 
-        className="btn btn-danger float-end wd-delete"
-      >
-        Delete
-      </button>
-      <button 
-        onClick={() => navigate(-1)}
-        className="btn btn-secondary float-start float-end me-2 wd-cancel"
-      >
-        Cancel
-      </button>
+      {isAdmin && (
+        <>
+          <button 
+            onClick={() => deleteUser(uid as string)} 
+            className="btn btn-danger float-end wd-delete"
+          >
+            Delete
+          </button>
+          <button 
+            onClick={() => navigate(-1)}
+            className="btn btn-secondary float-start float-end me-2 wd-cancel"
+          >
+            Cancel
+          </button>
+        </>
+      )}
+      {!isAdmin && (
+        <button 
+          onClick={() => navigate(-1)}
+          className="btn btn-secondary float-end wd-back"
+        >
+          Back
+        </button>
+      )}
     </div>
   );
 }

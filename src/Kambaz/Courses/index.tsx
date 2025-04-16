@@ -22,12 +22,8 @@ export default function Courses() {
   // Check if current user is a STUDENT
   const isStudent = currentUser?.role === "STUDENT";
   
-  // Check if student is enrolled in this course
-  const isEnrolled = enrollments.some(
-    (enrollment: any) => 
-      enrollment.user === currentUser?._id && 
-      enrollment.course === cid
-  );
+  // Check if student is enrolled in this course using course.enrolled property
+  const isEnrolled = course?.enrolled || false;
   
   // If user is a student but not enrolled in this course, redirect to Dashboard
   useEffect(() => {
@@ -61,6 +57,7 @@ export default function Courses() {
             <Route path="Quizzes" element={<h2>Quizzes</h2>} />
             <Route path="Grades" element={<h2>Grades</h2>} />
             <Route path="People" element={<PeopleTable />} />
+            <Route path="People/:uid" element={<PeopleTable />} />
           </Routes>
         </div>
       </div>

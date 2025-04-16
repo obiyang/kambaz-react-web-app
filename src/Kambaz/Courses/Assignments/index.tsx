@@ -74,6 +74,32 @@ export default function Assignments() {
     setAssignmentToDelete(null);
   };
 
+  // 格式化日期为友好格式
+  const formatDate = (dateString: string | undefined): string => {
+    if (!dateString) return "";
+    
+    try {
+      const date = new Date(dateString);
+      
+      // 检查日期是否有效
+      if (isNaN(date.getTime())) return dateString;
+      
+      // 格式化为 "May 13 at 11:59pm" 格式
+      const options: Intl.DateTimeFormatOptions = { 
+        month: 'long', 
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      };
+      
+      return date.toLocaleDateString('en-US', options).replace(',', ' at');
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return dateString;
+    }
+  };
+
   return (
     <div id="wd-assignments" className="p-2">
       {/* Delete Confirmation Modal */}
@@ -160,12 +186,12 @@ export default function Assignments() {
                   <span className="mx-2">|</span>
                   <span>
                     {assignment.availableFromDate 
-                      ? `Not available until ${assignment.availableFromDate}` 
+                      ? `Not available until ${formatDate(assignment.availableFromDate)}` 
                       : "Not available until May 6 at 12:00am"}
                   </span>
                 </div>
                 <div className="text-secondary fs-6">
-                  {assignment.dueDate ? `Due ${assignment.dueDate}` : "Due May 13 at 11:59pm"} | 
+                  {assignment.dueDate ? `Due ${formatDate(assignment.dueDate)}` : "Due May 13 at 11:59pm"} | 
                   {assignment.points ? `${assignment.points} pts` : "100 pts"}
                 </div>
               </div>

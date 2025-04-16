@@ -4,11 +4,31 @@ import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
 import { addCourse, deleteCourse, updateCourse } from "./Courses/reducer";
 import { enrollCourse, unenrollCourse } from "./Enrollments/reducer";
+import * as courseClient from "./Courses/client"; // 修复导入路径
 
-export default function Dashboard() {
+export default function Dashboard({ 
+  courses, 
+  course, 
+  setCourse, 
+  addNewCourse, 
+  deleteCourse: deleteCourseHandler, 
+  updateCourse: updateCourseHandler,
+  enrolling,
+  setEnrolling,
+  updateEnrollment
+}: { 
+  courses: any[]; 
+  course: any; 
+  setCourse: (course: any) => void; 
+  addNewCourse: () => void; 
+  deleteCourse: (courseId: string) => void; 
+  updateCourse: () => void;
+  enrolling: boolean;
+  setEnrolling: (enrolling: boolean) => void;
+  updateEnrollment: (courseId: string, enrolled: boolean) => void;
+}) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { courses } = useSelector((state: any) => state.coursesReducer);
   const { enrollments } = useSelector((state: any) => state.enrollmentsReducer);
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   
@@ -22,7 +42,7 @@ export default function Dashboard() {
   const [showAllCourses, setShowAllCourses] = useState(isFaculty ? true : false);
   
   // Local state only keeps the currently edited course
-  const [course, setCourse] = useState({
+  const [currentCourse, setCurrentCourse] = useState({
     _id: "", 
     name: "New Course", 
     number: "New Number",
@@ -73,7 +93,11 @@ export default function Dashboard() {
 
   // Handle course navigation, only enrolled students can access courses
   const handleCourseNavigation = (courseId: string, event: React.MouseEvent) => {
-    if (isStudent && !isEnrolled(courseId)) {
+    // 找到对应的课程对象
+    const course = courses.find((c: any) => c._id === courseId);
+    
+    // 如果是学生且课程未注册，阻止导航
+    if (isStudent && course && !course.enrolled) {
       event.preventDefault();
       // Student not enrolled in this course, prevent navigation
       return;
@@ -82,51 +106,92 @@ export default function Dashboard() {
     navigate(`/Kambaz/Courses/${courseId}/Home`);
   };
 
-  const displayedCourses = showAllCourses ? courses : courses.filter((course: any) => isEnrolled(course._id));
+  const displayedCourses = enrolling ? courses.filter((course: any) => course.enrolled) : courses;
 
-  const handleAddNewCourse = () => {
-    // Create a new course object without the _id field
-    const { _id, ...newCourse } = course; // Use object destructuring to exclude _id
-    
-    // Dispatch the action with the new course
-    dispatch(addCourse(newCourse));
-    
-    // Add debug information
-    console.log("Adding new course:", newCourse);
-    console.log("Current courses:", courses);
-    
-    // Reset form after adding
-    setCourse({
-      _id: "",
-      name: "New Course", 
-      number: "New Number",
-      startDate: "2023-09-10", 
-      endDate: "2023-12-15",
-      department: "D123",  
-      credits: 3,          
-      image: "/images/reactjs.jpg", 
-      description: "New Description"
-    });
-    
-    // Faculty users already see all courses by default
+  const handleAddNewCourse = async () => {
+    try {
+      // Create a new course object without the _id field
+      const { _id, ...newCourse } = currentCourse; // Use object destructuring to exclude _id
+      
+      console.log("Adding new course to MongoDB:", newCourse);
+      
+      // 调用API将课程保存到MongoDB
+      const createdCourse = await courseClient.createCourse(newCourse);
+      console.log("Course created in MongoDB:", createdCourse);
+      
+      // 更新Redux状态
+      dispatch(addCourse(createdCourse));
+      
+      // Reset form after adding
+      setCurrentCourse({
+        _id: "",
+        name: "New Course", 
+        number: "New Number",
+        startDate: "2023-09-10", 
+        endDate: "2023-12-15",
+        department: "D123",  
+        credits: 3,          
+        image: "/images/reactjs.jpg", 
+        description: "New Description"
+      });
+    } catch (error) {
+      console.error("Error creating course:", error);
+    }
   };
 
-  const handleDeleteCourse = (courseId: string) => {
-    dispatch(deleteCourse(courseId));
+  const handleDeleteCourse = async (courseId: string) => {
+    try {
+      console.log("Deleting course from MongoDB:", courseId);
+      
+      // 调用API从MongoDB中删除课程
+      const status = await courseClient.deleteCourse(courseId);
+      console.log("Course deleted from MongoDB:", status);
+      
+      // 更新Redux状态
+      dispatch(deleteCourse(courseId));
+    } catch (error) {
+      console.error("Error deleting course:", error);
+    }
   };
 
-  const handleUpdateCourse = () => {
-    dispatch(updateCourse(course));
+  const handleUpdateCourse = async () => {
+    try {
+      console.log("Updating course in MongoDB:", currentCourse);
+      
+      // 调用API更新MongoDB中的课程信息
+      const status = await courseClient.updateCourse(currentCourse);
+      console.log("Course updated in MongoDB:", status);
+      
+      // 更新Redux状态
+      dispatch(updateCourse(currentCourse));
+      
+      // 重置表单
+      setCurrentCourse({
+        _id: "",
+        name: "New Course", 
+        number: "New Number",
+        startDate: "2023-09-10", 
+        endDate: "2023-12-15",
+        department: "D123",  
+        credits: 3,          
+        image: "/images/reactjs.jpg", 
+        description: "New Description"
+      });
+    } catch (error) {
+      console.error("Error updating course:", error);
+    }
   };
 
   // Toggle between showing all courses or only enrolled courses
   const toggleCourseDisplay = () => {
-    setShowAllCourses(!showAllCourses);
+    setEnrolling(!enrolling);
   };
 
   return (
     <div id="wd-dashboard">
-      <h1 id="wd-dashboard-title">Dashboard</h1> <hr />
+      <h1 id="wd-dashboard-title">
+        Dashboard
+      </h1> <hr />
       
       {/* Only FACULTY role can see the new course form */}
       {isFaculty && (
@@ -140,28 +205,26 @@ export default function Dashboard() {
               Update
             </button>
           </h5><br />
-          <FormControl value={course.name} className="mb-2"
-                onChange={(e) => setCourse({ ...course, name: e.target.value })} />
-          <FormControl value={course.description} as="textarea" 
-                onChange={(e) => setCourse({ ...course, description: e.target.value })} />
+          <FormControl value={currentCourse.name} className="mb-2"
+                onChange={(e) => setCurrentCourse({ ...currentCourse, name: e.target.value })} />
+          <FormControl value={currentCourse.description} as="textarea" 
+                onChange={(e) => setCurrentCourse({ ...currentCourse, description: e.target.value })} />
           <hr />
         </>
       )}
       
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 id="wd-dashboard-published">
-          {showAllCourses ? "All Courses" : "My Courses"} ({displayedCourses.length})
+          {enrolling ? "My Courses" : "All Courses"} ({displayedCourses.length})
         </h2>
         
-        {/* Only STUDENT role can see the Enrollments button */}
-        {isStudent && (
-          <button 
-            className="btn btn-primary" 
-            onClick={toggleCourseDisplay}
-          >
-            {showAllCourses ? "My Enrollments" : "Enrollments"}
-          </button>
-        )}
+        {/* Toggle between all courses and enrolled courses */}
+        <button 
+          className="btn btn-primary" 
+          onClick={toggleCourseDisplay}
+        >
+          {enrolling ? "All Courses" : "My Enrollments"}
+        </button>
       </div>
       <hr />
       
@@ -209,7 +272,7 @@ export default function Dashboard() {
                           onClick={(event) => {
                             event.preventDefault();
                             event.stopPropagation(); // Prevent event bubbling to parent element
-                            setCourse({...course});
+                            setCurrentCourse({...course});
                           }}
                           className="btn btn-warning me-2 float-end">
                           Edit
@@ -217,23 +280,18 @@ export default function Dashboard() {
                       </>
                     )}
                     
-                    {/* Only STUDENT role can see enroll and unenroll buttons */}
+                    {/* Enrollment button */}
                     {isStudent && (
-                      isEnrolled(course._id) ? (
-                        <button 
-                          onClick={(e) => handleUnenrollCourse(course._id, e)} 
-                          className="btn btn-danger float-end"
-                        >
-                          Unenroll
-                        </button>
-                      ) : (
-                        <button 
-                          onClick={(e) => handleEnrollCourse(course._id, e)} 
-                          className="btn btn-success float-end"
-                        >
-                          Enroll
-                        </button>
-                      )
+                      <button 
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          updateEnrollment(course._id, !course.enrolled);
+                        }} 
+                        className={`btn ${course.enrolled ? "btn-danger" : "btn-success"} float-end`}
+                      >
+                        {course.enrolled ? "Unenroll" : "Enroll"}
+                      </button>
                     )}
                   </Card.Body>
                 </div>
