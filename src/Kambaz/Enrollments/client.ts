@@ -30,7 +30,7 @@ export const isUserEnrolledInCourse = async (userId: string, courseId: string) =
 
 // 注册用户到课程
 export const enrollUserInCourse = async (userId: string, courseId: string) => {
-  const response = await axiosWithCredentials.post(`${API_BASE}/users/${userId}/courses/${courseId}/enroll`);
+  const response = await axiosWithCredentials.post(`${API_BASE}/users/${userId}/courses/${courseId}`);
   return response.data;
 };
 
