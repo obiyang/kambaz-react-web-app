@@ -50,11 +50,21 @@ export const unenrollFromCourse = async (userId: string, courseId: string) => {
 
 export const signin = async (credentials: any) => {
   const response = await axiosWithCredentials.post(`${USERS_API}/signin`, credentials);
+  // 将用户信息保存到localStorage
+  if (response.data && response.data._id) {
+    localStorage.setItem("currentUser", JSON.stringify(response.data));
+    console.log("User info saved to localStorage:", response.data);
+  }
   return response.data;
 };
 
 export const signup = async (user: any) => {
   const response = await axiosWithCredentials.post(`${USERS_API}/signup`, user);
+  // 将用户信息保存到localStorage
+  if (response.data && response.data._id) {
+    localStorage.setItem("currentUser", JSON.stringify(response.data));
+    console.log("User info saved to localStorage:", response.data);
+  }
   return response.data;
 };
 
@@ -71,6 +81,9 @@ export const profile = async () => {
 };
 
 export const signout = async () => {
+  // 清除localStorage中的用户信息
+  localStorage.removeItem("currentUser");
+  console.log("User info removed from localStorage");
   const response = await axiosWithCredentials.post(`${USERS_API}/signout`);
   return response.data;
 };
