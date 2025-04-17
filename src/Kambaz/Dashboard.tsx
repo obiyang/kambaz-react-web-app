@@ -5,6 +5,8 @@ import { useState } from "react";
 import { addCourse, deleteCourse, updateCourse } from "./Courses/reducer";
 import { enrollCourse, unenrollCourse } from "./Enrollments/reducer";
 import * as courseClient from "./Courses/client"; // 修复导入路径
+import * as enrollmentClient from "./Enrollments/client";
+import * as userClient from "./Account/client";
 
 export default function Dashboard({ 
   courses, 
@@ -121,6 +123,20 @@ export default function Dashboard({
       
       // 更新Redux状态
       dispatch(addCourse(createdCourse));
+      
+      // 获取当前用户并手动注册到新创建的课程
+      try {
+        const currentUser = await userClient.profile();
+        if (currentUser && currentUser._id) {
+          console.log("Manually enrolling user to course:", currentUser._id, createdCourse._id);
+          await enrollmentClient.enrollUserInCourse(currentUser._id, createdCourse._id);
+          console.log("User manually enrolled successfully");
+        } else {
+          console.log("No current user found, cannot enroll");
+        }
+      } catch (enrollError) {
+        console.error("Error enrolling user to course:", enrollError);
+      }
       
       // Reset form after adding
       setCurrentCourse({
