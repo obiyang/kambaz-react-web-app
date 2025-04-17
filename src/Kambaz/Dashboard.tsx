@@ -124,15 +124,21 @@ export default function Dashboard({
       // 更新Redux状态
       dispatch(addCourse(createdCourse));
       
-      // 获取当前用户并手动注册到新创建的课程
+      // 获取当前用户信息 - 使用本地存储而不是API调用
       try {
-        const currentUser = await userClient.profile();
-        if (currentUser && currentUser._id) {
-          console.log("Manually enrolling user to course:", currentUser._id, createdCourse._id);
-          await enrollmentClient.enrollUserInCourse(currentUser._id, createdCourse._id);
-          console.log("User manually enrolled successfully");
+        // 从localStorage获取用户信息
+        const currentUserStr = localStorage.getItem("currentUser");
+        if (currentUserStr) {
+          const currentUser = JSON.parse(currentUserStr);
+          if (currentUser && currentUser._id) {
+            console.log("Manually enrolling user to course:", currentUser._id, createdCourse._id);
+            await enrollmentClient.enrollUserInCourse(currentUser._id, createdCourse._id);
+            console.log("User manually enrolled successfully");
+          } else {
+            console.log("No valid user ID in stored user data");
+          }
         } else {
-          console.log("No current user found, cannot enroll");
+          console.log("No current user found in localStorage");
         }
       } catch (enrollError) {
         console.error("Error enrolling user to course:", enrollError);
