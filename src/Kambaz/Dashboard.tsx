@@ -117,32 +117,28 @@ export default function Dashboard({
       
       console.log("Adding new course to MongoDB:", newCourse);
       
+      // 获取当前用户ID（从localStorage或其他来源）
+      let userId = null;
+      const currentUserStr = localStorage.getItem("currentUser");
+      if (currentUserStr) {
+        const currentUser = JSON.parse(currentUserStr);
+        if (currentUser && currentUser._id) {
+          userId = currentUser._id;
+        }
+      }
+      
+      // 在请求中包含用户ID
+      const courseWithUserId = {
+        ...newCourse,
+        userId: userId // 添加用户ID到请求体
+      };
+      
       // 调用API将课程保存到MongoDB
-      const createdCourse = await courseClient.createCourse(newCourse);
+      const createdCourse = await courseClient.createCourse(courseWithUserId);
       console.log("Course created in MongoDB:", createdCourse);
       
       // 更新Redux状态
       dispatch(addCourse(createdCourse));
-      
-      // 获取当前用户信息 - 使用本地存储而不是API调用
-      try {
-        // 从localStorage获取用户信息
-        const currentUserStr = localStorage.getItem("currentUser");
-        if (currentUserStr) {
-          const currentUser = JSON.parse(currentUserStr);
-          if (currentUser && currentUser._id) {
-            console.log("Manually enrolling user to course:", currentUser._id, createdCourse._id);
-            await enrollmentClient.enrollUserInCourse(currentUser._id, createdCourse._id);
-            console.log("User manually enrolled successfully");
-          } else {
-            console.log("No valid user ID in stored user data");
-          }
-        } else {
-          console.log("No current user found in localStorage");
-        }
-      } catch (enrollError) {
-        console.error("Error enrolling user to course:", enrollError);
-      }
       
       // Reset form after adding
       setCurrentCourse({
